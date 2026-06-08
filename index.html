@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DOT SPACE QUEST — 촉각 우주 학습 게임</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+<style>
+  /* =========================================================================
+     DOT SPACE QUEST — 콕핏 픽셀아트 스킨
+     접근성: WCAG AAA(본문 7:1+), 본문 18px+, 강한 포커스 링, 깜빡임 없음.
+     픽셀 글꼴(Press Start 2P)은 '장식용 제목·라벨'에만 사용하고,
+     읽어야 하는 본문/안내는 Noto Sans KR로 또렷하게 표시한다(저시력 가독성).
+     ========================================================================= */
+  :root {
+    --space:    #070b1c;   /* 우주 배경 */
+    --hull:     #16223f;   /* 선체 패널 */
+    --panel:    #111a33;   /* 콘솔 패널 */
+    --panel-2:  #1a2748;   /* 패널 강조 */
+    --edge:     #3b5a86;   /* 금속 테두리 */
+    --edge-lo:  #0a1124;   /* 어두운 테두리/그림자 */
+    --screen:   #141d34;   /* 뷰스크린 바탕 */
+    --green:    #7ee787;   /* 뷰스크린 테두리(초록) */
+    --ink:      #f3f7ff;   /* 본문(대비 ~16:1) */
+    --ink-dim:  #a9b7d6;   /* 보조(대비 ~8:1) */
+    --cyan:     #7fd6ff;   /* 라벨 시안 */
+    --yellow:   #ffd35c;   /* 강조 노랑 */
+    --mint:     #8fe6b0;   /* 진행/연결 */
+    --coral:    #ff8a76;   /* 경고/태양 */
+    --on:       #ffe9a8;   /* 점 ON(따뜻한 크림) */
+    --off:      #20294a;   /* 점 OFF */
+    --focus:    #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 700px at 78% 8%, #122244 0%, transparent 55%),
+      radial-gradient(900px 600px at 12% 92%, #101a3a 0%, transparent 55%),
+      var(--space);
+    color: var(--ink);
+    font-family: "Noto Sans KR", system-ui, sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    image-rendering: pixelated;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 22px 18px 40px; }
+
+  .pixel { font-family: "Press Start 2P", monospace; line-height: 1.5; letter-spacing: .5px; }
+
+  /* ---- 타이틀 ---- */
+  .title {
+    text-align: center;
+    margin: 4px 0 18px;
+  }
+  .title h1 {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(22px, 4.4vw, 40px);
+    margin: 0;
+    color: var(--cyan);
+    text-shadow: 0 0 10px rgba(127,214,255,.35), 3px 3px 0 var(--edge-lo);
+  }
+  .title h1 .mvp { color: var(--yellow); }
+  .title .sub { margin-top: 8px; color: var(--ink-dim); font-size: 15px; }
+
+  /* 패널 공통: 픽셀풍 하드 테두리 + 오프셋 그림자 */
+  .panel {
+    background: var(--panel);
+    border: 3px solid var(--edge);
+    box-shadow: 0 6px 0 var(--edge-lo), inset 0 0 0 2px var(--edge-lo);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .panel h2 {
+    font-family: "Press Start 2P", monospace;
+    font-size: 13px;
+    color: var(--yellow);
+    margin: 0 0 12px;
+    letter-spacing: .5px;
+  }
+
+  /* ---- 레이아웃: 좌(미션) 중(뷰스크린) 우(상태) ---- */
+  .deck {
+    display: grid;
+    grid-template-columns: 230px minmax(0,1fr) 250px;
+    gap: 16px;
+    align-items: start;
+  }
+  @media (max-width: 980px) { .deck { grid-template-columns: 1fr; } }
+
+  /* ---- MISSION MODE 탭 ---- */
+  .modes { display: grid; gap: 10px; }
+  .mode-tab {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 2px solid var(--edge);
+    border-radius: 6px;
+    padding: 11px 12px;
+    font-family: inherit; font-size: 17px; font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--edge-lo);
+    transition: border-color .12s, background .12s, transform .04s, box-shadow .04s;
+  }
+  .mode-tab .ico {
+    width: 30px; height: 30px; flex: none;
+    display: grid; place-items: center;
+    border: 2px solid var(--edge); border-radius: 5px;
+    background: var(--screen); color: var(--yellow);
+    font-family: "Press Start 2P", monospace; font-size: 12px;
+  }
+  .mode-tab small { display:block; font-weight:400; font-size:13px; color:var(--ink-dim); }
+  .mode-tab[aria-pressed="true"] { border-color: var(--green); background: #16234a; }
+  .mode-tab[aria-pressed="true"] .ico { border-color: var(--green); color: var(--mint); }
+  .mode-tab:hover { border-color: var(--cyan); }
+  .mode-tab:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge-lo); }
+
+  /* ---- 뷰스크린 ---- */
+  .screen-wrap { display: grid; gap: 12px; }
+  .screen-title {
+    text-align: center;
+    font-family: "Press Start 2P", monospace;
+    font-size: 13px; color: var(--green);
+    border: 2px solid var(--green); border-radius: 6px;
+    padding: 9px; background: rgba(126,231,135,.07);
+  }
+  .learn-bar {
+    font-family: "Press Start 2P", monospace; font-size: 11px;
+    color: var(--cyan); text-align: center; letter-spacing: .5px;
+  }
+  /* aria-live 안내 */
+  .guide {
+    background: var(--panel-2);
+    border: 2px solid var(--edge);
+    border-left: 5px solid var(--yellow);
+    border-radius: 6px;
+    padding: 12px 14px; min-height: 58px;
+    font-size: 18px; color: var(--ink);
+  }
+  .grid-frame {
+    background: var(--screen);
+    border: 4px solid var(--green);
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 2px var(--edge-lo), 0 6px 0 var(--edge-lo);
+    padding: 12px;
+    position: relative;
+    overflow-x: auto;
+  }
+  /* 정적 스캔라인(애니메이션 없음 — 광과민성 안전) */
+  .grid-frame::after {
+    content: ""; position: absolute; inset: 8px; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,.04) 0 1px, transparent 1px 4px);
+    border-radius: 6px;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(60, 1fr);
+    gap: 2px; width: 100%; min-width: 560px;
+    aspect-ratio: 60 / 40;
+    position: relative; z-index: 1;
+  }
+  .cell { background: var(--off); border-radius: 50%; width: 100%; aspect-ratio: 1/1; }
+  .cell.on { background: var(--on); box-shadow: 0 0 3px rgba(255,233,168,.5); }
+  .cell.cursor { box-shadow: 0 0 0 2px var(--cyan); border-radius: 2px; }
+
+  /* ---- 입력 패널 ---- */
+  .input-panel h2 { color: var(--yellow); }
+  .input-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
+    gap: 7px;
+  }
+  .dpad .spacer { visibility: hidden; }
+  button.key {
+    background: var(--panel-2); color: var(--ink);
+    border: 2px solid var(--edge); border-radius: 7px;
+    font-family: inherit; font-size: 20px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 3px 0 var(--edge-lo);
+    transition: transform .04s, box-shadow .04s, border-color .12s;
+  }
+  button.key:hover { border-color: var(--cyan); }
+  button.key:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge-lo); }
+  button.key.go { border-color: var(--green); }
+  .legend { font-size: 16px; color: var(--ink-dim); line-height: 1.9; }
+  .legend b { color: var(--mint); }
+  .legend .k {
+    font-family: "Press Start 2P", monospace; font-size: 11px; color: var(--ink);
+    background: var(--panel-2); border: 1px solid var(--edge); border-radius: 4px;
+    padding: 3px 6px; margin-right: 4px;
+  }
+  .extra-row { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+  button.action {
+    flex: 1 1 130px; min-height: 48px;
+    background: var(--panel-2); color: var(--ink);
+    border: 2px solid var(--edge); border-radius: 7px;
+    font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 3px 0 var(--edge-lo);
+  }
+  button.action:active { transform: translateY(2px); box-shadow:0 1px 0 var(--edge-lo); }
+
+  /* ---- 상태 패널 ---- */
+  .stat { display:grid; grid-template-columns: auto 1fr; gap: 9px 10px; align-items:center; margin-bottom: 4px; }
+  .stat .lbl { color: var(--cyan); font-size: 15px; font-family:"Press Start 2P",monospace; font-size:10px; letter-spacing:.5px; }
+  .stat .val { font-weight: 700; font-size: 18px; text-align: right; }
+  .stat .val.coord { color: var(--mint); }
+  .pill { display:inline-block; padding: 3px 10px; border-radius: 999px; font-size:14px; font-weight:700; border:2px solid var(--edge); }
+  .pill.off { color: var(--ink-dim); }
+  .pill.on { color:#04210f; background: var(--mint); border-color: var(--mint); }
+  .progress-track { grid-column: 1/-1; height: 12px; background: var(--off); border-radius: 999px; overflow:hidden; border:1px solid var(--edge); }
+  .progress-fill { height:100%; width:0%; background: var(--mint); transition: width .25s ease; }
+
+  #dotpadBtn {
+    width:100%; min-height:50px; margin-top:14px;
+    background: var(--panel-2); color: var(--ink);
+    border:2px solid var(--green); border-radius:7px;
+    font-family: inherit; font-size:18px; font-weight:700; cursor:pointer;
+    box-shadow: 0 3px 0 var(--edge-lo);
+  }
+  #dotpadBtn:active { transform: translateY(2px); box-shadow:0 1px 0 var(--edge-lo); }
+  .toggle-row { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:16px; color:var(--ink-dim); }
+  .toggle-row input { width:22px; height:22px; accent-color: var(--green); }
+  .keyhint { margin-top:14px; font-size:13px; color:var(--ink-dim); line-height:1.6; }
+  .keyhint code { background:var(--panel-2); border:1px solid var(--edge); border-radius:4px; padding:1px 5px; color:var(--ink); font-size:12px; }
+  .badge {
+    margin-top:14px; text-align:center; font-family:"Press Start 2P",monospace; font-size:10px;
+    color: var(--coral); border:2px dashed var(--edge); border-radius:6px; padding:10px 8px; line-height:1.7;
+  }
+
+  /* ---- 하단 배너 ---- */
+  .footer-banner {
+    margin-top: 18px; text-align:center;
+    border: 3px solid var(--edge); border-radius:6px;
+    background: var(--panel); box-shadow: 0 6px 0 var(--edge-lo);
+    padding: 12px;
+  }
+  .footer-banner .pixel { font-size: 13px; color: var(--yellow); }
+  .footer-banner .sub { color: var(--ink-dim); font-size:14px; margin-top:6px; }
+
+  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="title">
+    <h1 class="pixel">DOT SPACE QUEST <span class="mvp">MVP</span></h1>
+    <div class="sub">촉각 우주 학습 게임 · 60×40 점으로 만지는 우주 탐험</div>
+  </div>
+
+  <div class="deck">
+    <!-- 좌: MISSION MODE -->
+    <nav class="panel" aria-label="미션 선택">
+      <h2 class="pixel">MISSION MODE</h2>
+      <div class="modes">
+        <button class="mode-tab" data-mode="cosmos" aria-pressed="true">
+          <span class="ico">★</span>
+          <span>나의 우주<small>모은 것들을 만져보기</small></span>
+        </button>
+        <button class="mode-tab" data-mode="texture" aria-pressed="false">
+          <span class="ico">◐</span>
+          <span>행성 질감<small>표면을 만져서 배우기</small></span>
+        </button>
+        <button class="mode-tab" data-mode="moon" aria-pressed="false">
+          <span class="ico">1</span>
+          <span>달까지 가기<small>우주선으로 달 도착</small></span>
+        </button>
+        <button class="mode-tab" data-mode="dipper" aria-pressed="false">
+          <span class="ico">2</span>
+          <span>북두칠성<small>일곱 별 잇기</small></span>
+        </button>
+        <button class="mode-tab" data-mode="eclipse" aria-pressed="false">
+          <span class="ico">3</span>
+          <span>일식 체험<small>달이 해를 가리기</small></span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 중: 뷰스크린 -->
+    <section class="screen-wrap" aria-label="촉각 그래픽 미리보기">
+      <div class="screen-title pixel">60×40 TACTILE GRAPHICS AREA</div>
+      <div class="learn-bar" id="learnBar">LEARN MODE</div>
+      <div class="guide" id="guide" role="status" aria-live="polite"></div>
+      <div class="grid-frame">
+        <div id="grid" role="img" aria-label="60 곱하기 40 촉각 점 그래픽"></div>
+      </div>
+
+      <div class="panel input-panel" aria-label="조작">
+        <h2 class="pixel">INPUT &amp; REAL-TIME UPDATE</h2>
+        <div class="input-row">
+          <div class="dpad" role="group" aria-label="이동 방향">
+            <span class="spacer"></span>
+            <button class="key" data-action="up" aria-label="위로 이동">↑</button>
+            <span class="spacer"></span>
+            <button class="key" data-action="left" aria-label="왼쪽으로 이동 (패닝키 P1)">←</button>
+            <button class="key go" data-action="confirm" aria-label="확인 / 선택">●</button>
+            <button class="key" data-action="right" aria-label="오른쪽으로 이동 (패닝키 P2)">→</button>
+            <span class="spacer"></span>
+            <button class="key" data-action="down" aria-label="아래로 이동">↓</button>
+            <span class="spacer"></span>
+          </div>
+          <div class="legend">
+            <div><span class="k">↑↓←→</span> <b>이동 / 탐색</b></div>
+            <div><span class="k">확인 ●</span> <b>선택 / 확인</b></div>
+            <div><span class="k">다시</span> <b>현재 장면 다시 출력</b></div>
+          </div>
+        </div>
+        <div class="extra-row">
+          <button class="action" data-action="repeat" aria-label="현재 장면 다시 출력">다시 출력</button>
+          <button class="action" data-action="reset" aria-label="현재 미션 초기화">미션 초기화</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 우: 상태 -->
+    <aside class="panel" aria-label="진행 상태">
+      <h2 class="pixel">STATUS</h2>
+      <div class="stat">
+        <span class="lbl">COORDS</span><span class="val coord" id="coord">12, 28</span>
+        <span class="lbl">SCORE</span><span class="val" id="score" style="color:var(--yellow)">0</span>
+        <span class="lbl">MISSION</span><span class="val" id="phase" style="font-size:16px">MY COSMOS</span>
+        <span class="lbl">PROGRESS</span><span class="val" id="progressText">0%</span>
+        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+        <span class="lbl">DOT PAD</span><span class="val"><span class="pill off" id="dotpadPill">미연결</span></span>
+      </div>
+
+      <button id="dotpadBtn" aria-label="닷패드 블루투스 연결">닷패드 연결</button>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="ttsToggle" checked />
+        <label for="ttsToggle">음성 안내(TTS) 사용</label>
+      </div>
+
+      <div class="badge pixel">COSMIC<br />TACTILE<br />EXPLORER</div>
+
+      <p class="keyhint">
+        <b style="color:var(--ink)">실기기(닷패드):</b> 패닝키 <code>P1/P2</code>=좌/우,
+        기능키 <code>F1·F2</code>=위/아래, <code>F3</code>=확인, <code>F4</code>=다시.
+        BLE로 입력을 받아 스크린리더 가로채기를 우회합니다.<br />
+        <b style="color:var(--ink)">키보드(개발용):</b> <code>방향키</code>·<code>Enter</code>·<code>Space</code>·<code>1~3</code>·<code>R</code>.
+      </p>
+    </aside>
+  </div>
+
+  <div class="footer-banner">
+    <div class="pixel">REAL-TIME TACTILE OUTPUT &amp; LEARNING</div>
+    <div class="sub">화면 미리보기와 닷패드는 동일한 60×40 매트릭스로 동기화됩니다.</div>
+  </div>
+
+  <div class="sr-only" id="srLive" aria-live="assertive"></div>
+</div>
+
+<!-- DotPad Web SDK 1.0.0 (dotincorp/dotpad-sdk-guide), export 제거 후 인라인 -->
+<script>
+class DotPadSDK{static deviceMap=new Map;constructor(){this.DOTPAD_PREFIX="DotPad",this.DOTPAD_SERVICE="49535343-fe7d-4ae5-8fa9-9fafd205e455",this.DOTPAD_CHARACTERISTIC="49535343-1e4d-4bd9-ba61-23c647249616",this.ACK_PATTERN=/aa550006(..)0201(..)00.*/,this.NOTI_PATTERN=/aa550006(..)0202(..)00.*/}async request(){const t={filters:[{namePrefix:this.DOTPAD_PREFIX}],optionalServices:[this.DOTPAD_SERVICE]};return await navigator.bluetooth.requestDevice(t)}async connect(t){if(!t)throw new Error("No Bluetooth device selected");const e=await t.gatt.connect(),a=await t.gatt.getPrimaryService(this.DOTPAD_SERVICE),i=await a.getCharacteristic(this.DOTPAD_CHARACTERISTIC),s=e.device.name;return DotPadSDK.deviceMap.set(s,{service:a,characteristic:i}),e.connected}async disconnect(t){return DotPadSDK.deviceMap.has(t)&&DotPadSDK.deviceMap.delete(t),t.gatt.disconnect()}async displayGraphicData(t,e){this.displayFullData(t,e,"graphic")}async displayGraphicLineData(t,e,a,i){this.displayLineData(t,e,a,i,"graphic")}async resetGraphicData(t){const e=DotPadData.getResetData(300);this.displayGraphicData(t,e)}async displayTextData(t,e){const a=DotPadSDK.deviceMap.get(t.name);if(a&&a.characteristic){const t=new BrailleWordWrap(20,e).toWrappHex();DotPadSendModule.setBrailleWordWrapList(t),DotPadSendModule.sendBrailleWordWrap(a.characteristic,1)}else console.error("Device is not connected or characteristic not found")}async resetTextData(t){const e=DotPadSDK.deviceMap.get(t.name);if(e&&e.characteristic){const t=DotPadData.getResetData(20),a=DotPadData.getRequestLineData(0,0,t,!0);await e.characteristic.writeValue(a)}else console.error("Device is not connected or characteristic not found")}async displayFullData(t,e,a){const i=DotPadSDK.deviceMap.get(t.name);if(i&&i.characteristic){let t=[];"graphic"===a?t=DotPadData.getRequestData(e,!1):"text"===a&&(t=DotPadData.getRequestData(e,!0));let s=1;for(let e of t)DotPadSendModule.setSendData(s++,e,!1);await DotPadSendModule.sendNextLine(i.characteristic)}else console.error("Device is not connected or characteristic not found")}async displayLineData(t,e,a,i,s){const o=DotPadSDK.deviceMap.get(t.name);if(o&&o.characteristic){let t=null;"graphic"===s?t=DotPadData.getRequestLineData(e,a,i,!1):"text"===s&&(t=DotPadData.getRequestLineData(e,a,i,!0)),DotPadSendModule.setSendData(e,t,!1),await DotPadSendModule.sendNextLine(o.characteristic)}else console.error("Device is not connected or characteristic not found")}async addListenerKeyEvent(t,e){if(!t)throw new Error("No Bluetooth device connected");const a=DotPadSDK.deviceMap.get(t.name);a.characteristic.startNotifications().then((()=>{console.log("> Notifications started"),a.characteristic.addEventListener("characteristicvaluechanged",(async t=>{const i=new DotPadNotifyModule(t,a.characteristic);i.setAckProcess(),i.setPanningKeyEvent(e),i.setFunctionKeyEvent(e)}))}))}}class DotPadNotifyModule{constructor(t,e){this.ACK_PATTERN=/aa550006(..)0201(..)00.*/,this.NOTI_PATTERN=/aa550006(..)0202(..)00.*/,this.PANNING_KEY="aa55000900031200",this.FUNCTION_KEY="aa55000900033200",this.characteristic=e,this.receiveHexPacket=Array.from(new Uint8Array(t.target.value.buffer)).map((t=>t.toString(16).padStart(2,"0"))).join("")}async setAckProcess(){const t=this.receiveHexPacket.match(this.ACK_PATTERN);if(t){const e=parseInt(t[1],16);DotPadSendModule.setAckData(e,!0),await DotPadSendModule.sendNextLine(this.characteristic)}}setPanningKeyEvent(t){if(this.receiveHexPacket.startsWith(this.PANNING_KEY)){const e=parseInt(this.receiveHexPacket.slice(19,20),16);let a=DotPadSendModule.wordWrapPageNo,i=DotPadSendModule.sendWordWrapList.length;if(4===e){if(a>0&&i>0){let t=a>1?--a:a;DotPadSendModule.sendBrailleWordWrap(this.characteristic,t)}t("0")}else if(2===e){if(a>0&&i>0){let t=a<i?++a:a;DotPadSendModule.sendBrailleWordWrap(this.characteristic,t)}t("5")}}}setFunctionKeyEvent(t){if(this.receiveHexPacket.startsWith(this.FUNCTION_KEY)){const e=parseInt(this.receiveHexPacket.slice(16,17),16);8===e?t("1"):4===e?t("2"):2===e?t("3"):1===e&&t("4")}}}class DotPadSendModule{static sendMapData=new Map;static sendWordWrapList=[];static wordWrapPageNo=-1;static setBrailleWordWrapList(t){this.sendWordWrapList=[];for(let e=0;e<t.length;e++){const a=t[e],i=DotPadData.getRequestLineData(0,0,a,!0);this.sendWordWrapList.push(i)}this.wordWrapPageNo=-1}static async sendBrailleWordWrap(t,e){this.wordWrapPageNo=e;const a=this.sendWordWrapList[e-1];await t.writeValue(a)}static setSendData(t,e,a){this.sendMapData.set(t,{commandData:e,isAck:a})}static setAckData(t,e){let a=this.sendMapData.get(t);a&&(a.isAck=e)}static async sendNextLine(t){let e=this.getNextLineId();if(e>-1){let a=DotPadSendModule.sendMapData.get(e);a&&(await t.writeValue(a.commandData),console.log("nextLineId => "+e))}}static getNextLineId(){let t=-1;for(let e of this.sendMapData.keys()){if(!1===this.sendMapData.get(e).isAck){t=e;break}}return t}}class DotPadData{static getResetData(t){return Array(t).fill("00").join("")}static getRequestData(t,e){const a=DotDataUtil.hexToBytes(t),i=this._getRequestDataChunkList(a,30);return this._getCommandChunkList(i,e)}static getRequestLineData(t,e,a,i){const s=DotDataUtil.hexToBytes(a);return this._getCommandChunkLine(t,e,s,i)}static _getRequestDataChunkList(t,e){const a=[],i=t.length;for(let s=0;s<i;s+=e){const o=s+e,r=t.slice(s,o>i?i:o);a.push(r)}return a}static _getCommandChunkList(t,e){let a=[],i=1;for(const s of t){const t=this._getCommandChunkLine(i,0,s,e);a.push(t),i++}return a}static _getCommandChunkLine(t,e,a,i){const s=[...DotPadProtocol.getSync(),...DotPadProtocol.getLength(a),...DotPadProtocol.getDestId(t),...DotPadProtocol.getCommandType(),...DotPadProtocol.getDisplayMode(i),...DotPadProtocol.getStartCell(e),...DotPadProtocol.getDataBody(a),DotPadProtocol.getCheckSum(DotPadProtocol.getDestId(t),DotPadProtocol.getCommandType(),DotPadProtocol.getDisplayMode(i),DotPadProtocol.getStartCell(e),DotPadProtocol.getDataBody(a))];return DotDataUtil.hexToBytes(s.join(""))}}class DotPadProtocol{static getSync(){return["AA","55"]}static getLength(t){return["00",DotDataUtil.decimalToHex(t.length+6)]}static getDestId(t){return[DotDataUtil.decimalToHex(t)]}static getCommandType(){return["02","00"]}static getDisplayMode(t){return t?["80"]:["00"]}static getStartCell(t){return[DotDataUtil.decimalToHex(t)]}static getDataBody(t){return DotDataUtil.bytesToHexList(t)}static getCheckSum(t,e,a,i,s){const o=[...t,...e,...a,...i,...s];let r=165;for(const t of o)r^=parseInt(t,16);return DotDataUtil.decimalToHex(r)}}class DotDataUtil{static bytesToHex(t){return Array.from(t,(t=>t.toString(16).padStart(2,"0"))).join("")}static bytesToHexList(t){return Array.from(t,(t=>t.toString(16).padStart(2,"0")))}static decimalToHex(t){return Number(t).toString(16).padStart(2,"0")}static hexToBytes(t){if(t.length%2!=0)throw new Error("Odd number of hex digits");const e=t.length/2,a=new Uint8Array(e);for(let i=0;i<e;i++){const e=parseInt(t.substring(2*i,2*i+2),16);if(isNaN(e))throw new Error("Expected hex string");a[i]=e}return a}}class BrailleWordWrap{static DOUBLE_ZERO="00";constructor(t,e){this.cellSizeHex=2*t,this.brailleHexData=e}toWrappHex(){let t=this.processHexData();return this.generateWrappedHexList(t)}processHexData(){let t=this.brailleHexData.trim().endsWith(BrailleWordWrap.DOUBLE_ZERO),e=this.brailleHexData.split(BrailleWordWrap.DOUBLE_ZERO),a=[];for(let t=0;t<e.length;t++)a[t]=e[t].replace(/\s+/g,"")+BrailleWordWrap.DOUBLE_ZERO;if(!t&&a.length>0){let t=a.length-1;a[t]=this.removeTrailingDoubleZero(a[t])}return a}generateWrappedHexList(t){let e=[],a=[];for(let i of t)this.appendDataToSegment(i,a,e);return a.length>0&&e.push(this.padSegment(a.join(""))),e}appendDataToSegment(t,e,a){e.join("").length+t.length<=this.cellSizeHex||(e.length>0&&a.push(this.padSegment(e.join(""))),e.length=0),e.push(t)}padSegment(t){for(;t.length<this.cellSizeHex;)t+="0";return t}removeTrailingDoubleZero(t){return t.substring(0,t.length-2)}addSpacesBetweenEveryTwoCharacters(t){let e=t.join(""),a=[];for(let t=0;t<e.length;t+=2)t>0&&a.push(" "),a.push(e.substring(t,Math.min(t+2,e.length)));return a.join("")}}
+</script>
+<script>
+/* =========================================================================
+   DOT SPACE QUEST — 핵심 로직
+   원칙: 60×40 매트릭스 1개를 단일 소스로 두고, 입력마다 전체를 다시 그려
+         웹 미리보기와 닷패드 출력을 동기화한다.(부분 업데이트 X)
+   ========================================================================= */
+const GRID_WIDTH = 60, GRID_HEIGHT = 40;
+
+/* ---- 매트릭스 유틸 ---- */
+function createEmptyMatrix() {
+  return Array.from({ length: GRID_HEIGHT }, () => Array.from({ length: GRID_WIDTH }, () => 0));
+}
+function setPixel(m, x, y) {
+  if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) return; // 영역 밖 무시
+  m[y][x] = 1;
+}
+function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length !== GRID_HEIGHT) return false;
+  return matrix.every(r => Array.isArray(r) && r.length === GRID_WIDTH && r.every(c => c === 0 || c === 1));
+}
+
+/* ---- 그리기 헬퍼 ---- */
+function drawShip(m, cx, cy) { // 방향성 삼각형 우주선
+  setPixel(m, cx, cy - 1);
+  setPixel(m, cx - 1, cy); setPixel(m, cx, cy); setPixel(m, cx + 1, cy);
+  setPixel(m, cx - 1, cy + 1); setPixel(m, cx + 1, cy + 1);
+}
+function drawCircle(m, cx, cy, r, fill) { // 중점원(fill=true 채움 / false 테두리)
+  for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) {
+    const d = Math.round(Math.sqrt(x * x + y * y));
+    if (fill ? d <= r : d === r) setPixel(m, cx + x, cy + y);
+  }
+}
+function drawStarCross(m, cx, cy) {
+  setPixel(m, cx, cy); setPixel(m, cx-1, cy); setPixel(m, cx+1, cy); setPixel(m, cx, cy-1); setPixel(m, cx, cy+1);
+}
+function drawStarBold(m, cx, cy) {
+  drawStarCross(m, cx, cy);
+  setPixel(m, cx-1, cy-1); setPixel(m, cx+1, cy-1); setPixel(m, cx-1, cy+1); setPixel(m, cx+1, cy+1);
+}
+function drawLine(m, x0, y0, x1, y1) { // 브레젠험 실선
+  let dx = Math.abs(x1-x0), dy = Math.abs(y1-y0), sx = x0<x1?1:-1, sy = y0<y1?1:-1, err = dx-dy;
+  while (true) { setPixel(m, x0, y0); if (x0===x1 && y0===y1) break;
+    const e2 = 2*err; if (e2>-dy){err-=dy;x0+=sx;} if (e2<dx){err+=dx;y0+=sy;} }
+}
+function drawDottedLine(m, x0, y0, x1, y1) { // 점선(2칸 간격)
+  const steps = Math.max(Math.abs(x1-x0), Math.abs(y1-y0));
+  for (let i = 0; i <= steps; i += 2) { const t = steps===0?0:i/steps;
+    setPixel(m, Math.round(x0+(x1-x0)*t), Math.round(y0+(y1-y0)*t)); }
+}
+// 행성 안에서만 채우는 덩어리(대륙 등)
+function fillBlob(m, bx, by, br, pcx, pcy, pR) {
+  for (let y = by-br; y <= by+br; y++) for (let x = bx-br; x <= bx+br; x++) {
+    if (Math.hypot(x-bx, y-by) <= br && Math.hypot(x-pcx, y-pcy) <= pR) setPixel(m, x, y);
+  }
+}
+
+/* =========================================================================
+   게임 상태
+   ========================================================================= */
+let mode = "cosmos";
+let tactileMatrix = createEmptyMatrix();
+let score = 0;
+let webCursor = { x: 30, y: 20, show: false }; // 탐색 커서(웹 표시용)
+
+// 자라나는 "나의 우주" — 미션을 완료하면 채워진다
+const cosmos = { moon: false, dipper: false, eclipse: false, planets: 0 };
+const state_cosmos = { cursor: { x: 30, y: 20 } };
+
+// 미션 1: 달까지 가기
+const MOON = { x: 50, y: 8, radius: 6 };
+const state_moon = { ship: { x: 12, y: 28 }, arrived: false };
+
+// 미션 2: 북두칠성(7개 별, 순서대로 도달)
+const DIPPER_STARS = [
+  { x: 10, y: 12 }, { x: 18, y: 10 }, { x: 26, y: 13 },
+  { x: 33, y: 18 }, { x: 41, y: 16 }, { x: 47, y: 22 }, { x: 50, y: 14 },
+];
+const state_dipper = { ship: { x: 10, y: 30 }, visited: 0 };
+
+// 미션 3: 일식(0~4단계)
+const SUN = { x: 30, y: 20, radius: 8 };
+const state_eclipse = { step: 0 };
+const ECLIPSE_STEPS = [
+  "해가 떠 있어요. 오른쪽 버튼을 눌러 달을 움직여 보세요.",
+  "달이 다가오기 시작했어요.",
+  "부분일식이에요. 해의 일부가 가려졌어요.",
+  "개기일식이에요. 해가 거의 다 가려졌어요.",
+  "일식이 끝났어요. 해가 다시 보여요.",
+];
+
+// 행성 질감(만져서 배우기) — 각 행성마다 다른 '느껴지는' 패턴
+const PLANETS = [
+  { ko:"지구", en:"EARTH", feat:"울퉁불퉁한 산맥(대륙)",
+    guide:"지구예요. 솟아오른 대륙은 산맥처럼 울퉁불퉁하고, 바다는 매끄러워요. 손끝으로 차이를 느껴보고 가장 울퉁불퉁한 대륙에서 확인을 누르세요.",
+    draw(m){ drawCircle(m,30,20,16,false);
+      [[22,13,5],[39,24,6],[19,27,3],[41,12,3]].forEach(([x,y,r])=>fillBlob(m,x,y,r,30,20,15)); },
+    target:{x:39,y:24,r:4} },
+  { ko:"화성", en:"MARS", feat:"동그란 분화구",
+    guide:"화성이에요. 표면에 크고 작은 분화구가 솟아 있어요. 동그란 덩어리를 찾아 가장 큰 분화구에서 확인을 누르세요.",
+    draw(m){ drawCircle(m,30,20,16,false);
+      [[24,14,2],[36,15,2],[30,27,3],[20,22,2],[40,25,2]].forEach(([x,y,r])=>drawCircle(m,x,y,r,true)); },
+    target:{x:30,y:27,r:4} },
+  { ko:"목성", en:"JUPITER", feat:"매끄러운 가로 줄무늬",
+    guide:"목성이에요. 가로로 긴 줄무늬가 흘러요. 손가락을 좌우로 움직여 줄무늬를 따라가 보고 가운데 줄에서 확인을 누르세요.",
+    draw(m){ drawCircle(m,30,20,16,false);
+      for(let y=9;y<=31;y+=3) for(let x=15;x<=45;x+=2) if(Math.hypot(x-30,y-20)<=15) setPixel(m,x,y); },
+    target:{x:30,y:21,r:3} },
+  { ko:"토성", en:"SATURN", feat:"넓은 고리",
+    guide:"토성이에요. 행성을 빙 두르는 넓은 고리가 있어요. 행성을 가로지르는 긴 선을 따라 바깥 고리 끝에서 확인을 누르세요.",
+    draw(m){ drawCircle(m,30,20,8,false);
+      for(let y=18;y<=22;y++) drawDottedLine(m,6,y,53,y); },
+    target:{x:50,y:20,r:4} },
+];
+const state_texture = { idx: 0, cursor: { x: 30, y: 20 }, solved: [false,false,false,false] };
+
+/* =========================================================================
+   장면 그리기
+   ========================================================================= */
+function drawCurrentScene(m) {
+  if (mode === "cosmos")  drawCosmosScene(m);
+  if (mode === "texture") drawTextureScene(m);
+  if (mode === "moon")    drawMoonScene(m);
+  if (mode === "dipper")  drawDipperScene(m);
+  if (mode === "eclipse") drawEclipseScene(m);
+}
+
+// 나의 우주: 모은 것들이 하나의 밤하늘로 쌓인다
+function drawCosmosScene(m) {
+  [[5,5],[14,3],[55,4],[47,6],[3,30],[58,33],[34,2],[2,16]].forEach(([x,y]) => setPixel(m, x, y)); // 배경 별
+  if (cosmos.moon) { drawCircle(m, 50, 8, 5, true); [[-2,-1],[1,1],[0,2]].forEach(([dx,dy])=>{ if(m[8+dy]) m[8+dy][50+dx]=0; }); }
+  if (cosmos.dipper) {
+    for (let i = 1; i < DIPPER_STARS.length; i++){ const a=DIPPER_STARS[i-1],b=DIPPER_STARS[i]; drawLine(m,a.x,a.y,b.x,b.y); }
+    DIPPER_STARS.forEach(s => drawStarBold(m, s.x, s.y));
+  }
+  if (cosmos.eclipse) { drawCircle(m, 12, 33, 4, false); drawCircle(m, 12, 33, 2, true); } // 일식의 기억
+  for (let i = 0; i < cosmos.planets; i++) drawCircle(m, 8 + i*5, 38, 1, true); // 탐험한 행성 마커
+}
+
+function drawMoonScene(m) {
+  const s = state_moon, ship = s.ship;
+  drawDottedLine(m, ship.x, ship.y, MOON.x, MOON.y); // 안내 궤도
+  const dist = Math.hypot(MOON.x - ship.x, MOON.y - ship.y);
+  const r = s.arrived ? MOON.radius : Math.max(2, Math.round(MOON.radius - dist / 12));
+  if (s.arrived) { drawCircle(m, MOON.x, MOON.y, r, true);
+    [[-2,-1],[2,1],[0,2],[-1,2]].forEach(([dx,dy]) => { if (m[MOON.y+dy]) m[MOON.y+dy][MOON.x+dx] = 0; }); } // 크레이터
+  else drawCircle(m, MOON.x, MOON.y, r, false);
+  drawShip(m, ship.x, ship.y);
+}
+
+function drawDipperScene(m) {
+  const s = state_dipper;
+  for (let i = 1; i < s.visited; i++){ const a=DIPPER_STARS[i-1],b=DIPPER_STARS[i]; drawLine(m,a.x,a.y,b.x,b.y); }
+  DIPPER_STARS.forEach((star, i) => {
+    if (i < s.visited) drawStarBold(m, star.x, star.y);
+    else if (i === s.visited) drawStarCross(m, star.x, star.y); // 다음 목표
+    else setPixel(m, star.x, star.y);
+  });
+  drawShip(m, s.ship.x, s.ship.y);
+}
+
+function drawEclipseScene(m) {
+  const step = state_eclipse.step;
+  drawCircle(m, SUN.x, SUN.y, SUN.radius, true);
+  for (let a = 0; a < 360; a += 45) { const rad = a*Math.PI/180;
+    setPixel(m, SUN.x + Math.round(Math.cos(rad)*(SUN.radius+2)), SUN.y + Math.round(Math.sin(rad)*(SUN.radius+2))); }
+  const moonX = -10 + step * 12;
+  if (step >= 1 && step <= 3) {
+    for (let y = -SUN.radius; y <= SUN.radius; y++) for (let x = -SUN.radius; x <= SUN.radius; x++)
+      if (Math.hypot(x-(moonX-SUN.x), y) <= SUN.radius && m[SUN.y+y]) m[SUN.y+y][SUN.x+x] = 0;
+  }
+}
+
+function drawTextureScene(m) { PLANETS[state_texture.idx].draw(m); }
+
+/* =========================================================================
+   출력 파이프라인
+   ========================================================================= */
+function updateTactileOutput() {
+  tactileMatrix = createEmptyMatrix();
+  drawCurrentScene(tactileMatrix);
+  renderPreview(tactileMatrix);
+  sendToDotPad(tactileMatrix);
+  updateStatus();
+}
+
+let cellEls = [];
+function buildGridDom() {
+  const grid = document.getElementById("grid");
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < GRID_WIDTH * GRID_HEIGHT; i++) { const d = document.createElement("div"); d.className = "cell"; frag.appendChild(d); cellEls.push(d); }
+  grid.appendChild(frag);
+}
+function renderPreview(m) {
+  for (let y = 0; y < GRID_HEIGHT; y++) for (let x = 0; x < GRID_WIDTH; x++)
+    cellEls[y*GRID_WIDTH + x].classList.toggle("on", m[y][x] === 1);
+  cellEls.forEach(e => e.classList.remove("cursor"));
+  if (webCursor.show) { const i = webCursor.y*GRID_WIDTH + webCursor.x; if (cellEls[i]) cellEls[i].classList.add("cursor"); }
+}
+
+/* =========================================================================
+   DotPad 실기기 연동 (Web Bluetooth / DotPad Web SDK 1.0.0)
+   그래픽 영역 = 300셀 = 가로 30셀 × 세로 10셀, 셀 1개 = 가로2×세로4점 = 1바이트
+   → 60×40 매트릭스 = 정확히 300바이트(600 hex)
+   ========================================================================= */
+const sdk = new DotPadSDK();
+let dotpadDevice = null, dotpadConnected = false, sending = false;
+// 8점 점자 셀 비트 매핑 (실기기에서 상하/좌우 뒤집히면 이 표만 수정)
+const DOT_BIT = { "0,0":0,"0,1":1,"0,2":2,"0,3":6,"1,0":3,"1,1":4,"1,2":5,"1,3":7 };
+function matrixToGraphicHex(m) {
+  const bytes = new Array(300).fill(0);
+  for (let y = 0; y < GRID_HEIGHT; y++) for (let x = 0; x < GRID_WIDTH; x++) {
+    if (m[y][x] !== 1) continue;
+    const idx = Math.floor(y/4)*30 + Math.floor(x/2);
+    bytes[idx] |= (1 << DOT_BIT[(x%2) + "," + (y%4)]);
+  }
+  return bytes.map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function sendToDotPad(matrix) {
+  if (!isValidMatrix(matrix)) { console.error("Invalid matrix. Dot Pad output requires 60×40."); return; }
+  if (!dotpadConnected || !dotpadDevice || sending) return;
+  sending = true;
+  try { await sdk.displayGraphicData(dotpadDevice, matrixToGraphicHex(matrix)); }
+  catch (e) { console.error("DotPad 전송 실패:", e); }
+  finally { sending = false; }
+}
+async function connectDotPad() {
+  if (!navigator.bluetooth) { announce("이 브라우저는 Web Bluetooth를 지원하지 않아요. 안드로이드 크롬이나 데스크톱 크롬을 사용하세요."); return; }
+  try {
+    dotpadDevice = await sdk.request();
+    const ok = await sdk.connect(dotpadDevice);
+    if (!ok) { announce("닷패드 연결에 실패했어요."); return; }
+    dotpadConnected = true;
+    dotpadDevice.addEventListener("gattserverdisconnected", () => { dotpadConnected = false; updateStatus(); announce("닷패드 연결이 끊어졌어요."); });
+    // 패닝키 P1/P2 → "0"/"5", 기능키 F1~F4 → "1"~"4"
+    sdk.addListenerKeyEvent(dotpadDevice, (code) => {
+      const map = { "0":"left", "5":"right", "1":"up", "2":"down", "3":"confirm", "4":"repeat" };
+      if (map[code]) dispatchAction(map[code]);
+    });
+    announce("닷패드가 연결됐어요. 기기의 패닝키·기능키로 바로 조작할 수 있어요.");
+    updateTactileOutput();
+  } catch (e) { console.error(e); announce("닷패드 연결이 취소되었거나 실패했어요."); }
+}
+async function disconnectDotPad() {
+  try { if (dotpadDevice) { await sdk.resetGraphicData(dotpadDevice); await sdk.disconnect(dotpadDevice); } }
+  catch (e) { console.error(e); }
+  dotpadConnected = false; updateStatus(); announce("닷패드 연결을 해제했어요.");
+}
+
+/* =========================================================================
+   입력: 모든 조작은 dispatchAction() 한 곳으로 — 실기기 키 드라이버도 여기로 연결됨
+   ========================================================================= */
+function dispatchAction(action) {
+  if (action === "reset")  { resetMission(); return; }
+  if (action === "repeat") { announce("현재 장면을 다시 출력했어요."); updateTactileOutput(); return; }
+  if (mode === "cosmos")  cosmosAction(action);
+  if (mode === "texture") textureAction(action);
+  if (mode === "moon")    moonAction(action);
+  if (mode === "dipper")  dipperAction(action);
+  if (mode === "eclipse") eclipseAction(action);
+  updateTactileOutput();
+}
+function moveOnGrid(o, action) {
+  if (action === "left")  o.x = Math.max(0, o.x - 1);
+  if (action === "right") o.x = Math.min(GRID_WIDTH - 1, o.x + 1);
+  if (action === "up")    o.y = Math.max(0, o.y - 1);
+  if (action === "down")  o.y = Math.min(GRID_HEIGHT - 1, o.y + 1);
+}
+
+function moonAction(action) {
+  const s = state_moon;
+  if (["left","right","up","down"].includes(action)) { moveOnGrid(s.ship, action); announceCoord(s.ship); }
+  else if (action === "confirm") {
+    const dist = Math.hypot(MOON.x - s.ship.x, MOON.y - s.ship.y);
+    if (dist <= MOON.radius + 1 && !s.arrived) {
+      s.arrived = true; cosmos.moon = true; score += 30;
+      announce("달에 도착했어요! 크레이터가 만져져요. '나의 우주'에 달이 떠올랐어요. 미션 성공!");
+    } else if (!s.arrived) announce("아직 달에서 멀어요. 달은 오른쪽 위에 있어요. 계속 이동해 보세요.");
+  }
+}
+
+function dipperAction(action) {
+  const s = state_dipper;
+  if (["left","right","up","down"].includes(action)) { moveOnGrid(s.ship, action); announceCoord(s.ship); }
+  else if (action === "confirm") {
+    if (s.visited >= DIPPER_STARS.length) return;
+    const t = DIPPER_STARS[s.visited];
+    if (Math.hypot(t.x - s.ship.x, t.y - s.ship.y) <= 2) {
+      s.visited += 1; score += 10;
+      if (s.visited >= DIPPER_STARS.length) { cosmos.dipper = true; announce("일곱 별을 모두 이었어요! 북두칠성이 '나의 우주'에 박혔어요. 미션 성공!"); }
+      else if (s.visited === 1) announce("첫 번째 별 도착! 다음 별로 이동해 이어 보세요.");
+      else announce(`별 ${s.visited}개 연결! 다음 별로 이동하세요.`);
+    } else announce("목표 별(십자 모양) 위에 우주선을 올린 다음 확인을 누르세요.");
+  }
+}
+
+function eclipseAction(action) { // 좌=이전, 우=다음 (실기기 2키 모델의 본보기)
+  const s = state_eclipse;
+  if (action === "right") s.step = Math.min(ECLIPSE_STEPS.length - 1, s.step + 1);
+  if (action === "left")  s.step = Math.max(0, s.step - 1);
+  if (s.step === ECLIPSE_STEPS.length - 1 && !cosmos.eclipse) { cosmos.eclipse = true; score += 25;
+    announce(ECLIPSE_STEPS[s.step] + " 일식의 기억이 '나의 우주'에 새겨졌어요!"); }
+  else announce(ECLIPSE_STEPS[s.step]);
+}
+
+function textureAction(action) {
+  const s = state_texture, c = s.cursor, p = PLANETS[s.idx];
+  if (["left","right","up","down"].includes(action)) {
+    moveOnGrid(c, action); webCursor.x = c.x; webCursor.y = c.y; announce(scanTextureAt(c.x, c.y));
+  } else if (action === "confirm") {
+    if (!s.solved[s.idx]) {
+      if (Math.hypot(p.target.x - c.x, p.target.y - c.y) <= p.target.r) {
+        s.solved[s.idx] = true; score += 20; cosmos.planets = s.solved.filter(Boolean).length;
+        announce(`정답! ${p.ko}의 ${p.feat}을(를) 찾았어요! '나의 우주'에 ${p.ko}이(가) 추가됐어요. 다음 행성은 확인을 한 번 더 누르세요.`);
+      } else announce(`여기는 아니에요. ${p.feat}이(가) 있는 곳을 더 찾아보세요.`);
+    } else { // 이미 푼 행성 → 다음 행성으로
+      s.idx = (s.idx + 1) % PLANETS.length; c.x = 30; c.y = 20; webCursor.x = 30; webCursor.y = 20;
+      announce(PLANETS[s.idx].guide);
+    }
+  }
+}
+// 커서 아래 질감을 손끝 느낌으로 안내
+function scanTextureAt(x, y) {
+  const p = PLANETS[state_texture.idx];
+  let cnt = 0;
+  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++)
+    if (tactileMatrix[y+dy] && tactileMatrix[y+dy][x+dx]) cnt++;
+  if (cnt >= 2) return `울퉁불퉁해요 — ${p.feat}.`;        // 밀도가 높으면 그 행성의 특징
+  if (Math.hypot(x - 30, y - 20) > 17) return "행성 바깥, 빈 우주예요.";
+  return "매끄러워요.";
+}
+
+function cosmosAction(action) {
+  const c = state_cosmos.cursor;
+  if (["left","right","up","down"].includes(action)) { moveOnGrid(c, action); webCursor.x = c.x; webCursor.y = c.y; announce(nearestCosmosLabel(c.x, c.y)); }
+  else if (action === "confirm") announce(cosmosSummary());
+}
+function cosmosSummary() {
+  const items = [];
+  if (cosmos.moon) items.push("달");
+  if (cosmos.dipper) items.push("북두칠성");
+  if (cosmos.eclipse) items.push("일식의 기억");
+  if (cosmos.planets > 0) items.push(`행성 ${cosmos.planets}개`);
+  if (items.length === 0) return "나의 우주가 아직 비어 있어요. 미션을 완료하면 여기에 별과 달이 쌓여요. 방향키로 천천히 훑어보세요.";
+  return `내가 모은 우주: ${items.join(", ")}. 방향키로 손끝으로 훑어보세요.`;
+}
+function nearestCosmosLabel(x, y) {
+  const here = tactileMatrix[y] && tactileMatrix[y][x];
+  const lms = [];
+  if (cosmos.moon) lms.push({ x: 50, y: 8, name: "달" });
+  if (cosmos.dipper) lms.push({ x: 33, y: 14, name: "북두칠성" });
+  if (cosmos.eclipse) lms.push({ x: 12, y: 33, name: "일식의 기억" });
+  if (lms.length === 0) return "아직 아무것도 없어요. 미션을 완료해 우주를 채워보세요.";
+  let best = lms[0], bd = Infinity;
+  for (const l of lms) { const d = Math.hypot(l.x - x, l.y - y); if (d < bd) { bd = d; best = l; } }
+  return (here ? "여기 무언가 만져져요. " : "") + `${best.name} 근처예요.`;
+}
+
+/* =========================================================================
+   안내(텍스트 + TTS) & 상태/HUD
+   ========================================================================= */
+function announce(text) { document.getElementById("guide").textContent = text; speak(text); }
+function announceCoord(ship) { document.getElementById("srLive").textContent = `좌표 ${ship.x}, ${ship.y}`; }
+const synth = window.speechSynthesis || null;
+function speak(text) {
+  if (!synth || !document.getElementById("ttsToggle").checked) return;
+  synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = "ko-KR"; u.rate = 0.95; synth.speak(u);
+}
+function updateStatus() {
+  const cur = mode === "moon" ? state_moon.ship : mode === "dipper" ? state_dipper.ship
+            : mode === "texture" ? state_texture.cursor : mode === "cosmos" ? state_cosmos.cursor : null;
+  document.getElementById("coord").textContent = cur ? `${cur.x}, ${cur.y}` : "—";
+  document.getElementById("score").textContent = score;
+  document.getElementById("phase").textContent = PHASE_LABEL[mode];
+
+  let pct = 0;
+  if (mode === "moon") pct = state_moon.arrived ? 100 : 0;
+  if (mode === "dipper") pct = Math.round(state_dipper.visited / DIPPER_STARS.length * 100);
+  if (mode === "eclipse") pct = Math.round(state_eclipse.step / (ECLIPSE_STEPS.length - 1) * 100);
+  if (mode === "texture") pct = Math.round(state_texture.solved.filter(Boolean).length / PLANETS.length * 100);
+  if (mode === "cosmos") { const got = (cosmos.moon?1:0)+(cosmos.dipper?1:0)+(cosmos.eclipse?1:0)+(cosmos.planets>0?1:0); pct = Math.round(got/4*100); }
+  document.getElementById("progressText").textContent = pct + "%";
+  document.getElementById("progressFill").style.width = pct + "%";
+
+  const pill = document.getElementById("dotpadPill");
+  pill.textContent = dotpadConnected ? "연결됨" : "미연결";
+  pill.className = "pill " + (dotpadConnected ? "on" : "off");
+  const btn = document.getElementById("dotpadBtn");
+  if (btn) btn.textContent = dotpadConnected ? "닷패드 연결 해제" : "닷패드 연결";
+}
+
+/* =========================================================================
+   미션 전환 / 초기화
+   ========================================================================= */
+const MISSION_TITLE = { cosmos:"나의 우주", texture:"행성 질감 탐험", moon:"달까지 가기", dipper:"북두칠성 연결", eclipse:"일식 체험" };
+const PHASE_LABEL   = { cosmos:"MY COSMOS", texture:"PLANET TEXTURES", moon:"MOON LANDING", dipper:"BIG DIPPER", eclipse:"SOLAR ECLIPSE" };
+const MISSION_INTRO = {
+  moon:    "달까지 가기. 우주선을 움직여 오른쪽 위의 달에 도착하고, 도착하면 확인을 누르세요.",
+  dipper:  "북두칠성 연결. 십자 모양 별 위로 우주선을 옮기고 확인을 눌러 일곱 별을 순서대로 이으세요.",
+  eclipse: "일식 체험. 오른쪽 버튼으로 달을 움직여 해를 가려 보고, 왼쪽 버튼으로 되돌릴 수 있어요.",
+};
+function setMode(next) {
+  mode = next;
+  document.querySelectorAll(".mode-tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === next)));
+  document.getElementById("learnBar").textContent = "LEARN MODE: " + PHASE_LABEL[next];
+  webCursor.show = (next === "texture" || next === "cosmos");
+  if (next === "texture") { webCursor.x = state_texture.cursor.x; webCursor.y = state_texture.cursor.y; announce(PLANETS[state_texture.idx].guide); }
+  else if (next === "cosmos") { webCursor.x = state_cosmos.cursor.x; webCursor.y = state_cosmos.cursor.y; announce(cosmosSummary()); }
+  else announce(MISSION_INTRO[next]);
+  updateTactileOutput();
+}
+function resetMission() {
+  if (mode === "moon")    { state_moon.ship = { x:12, y:28 }; state_moon.arrived = false; }
+  if (mode === "dipper")  { state_dipper.ship = { x:10, y:30 }; state_dipper.visited = 0; }
+  if (mode === "eclipse") { state_eclipse.step = 0; }
+  if (mode === "texture") { state_texture.cursor = { x:30, y:20 }; webCursor.x = 30; webCursor.y = 20; }
+  if (mode === "cosmos")  { state_cosmos.cursor = { x:30, y:20 }; webCursor.x = 30; webCursor.y = 20; }
+  setMode(mode);
+}
+
+/* =========================================================================
+   이벤트 연결
+   ========================================================================= */
+function init() {
+  buildGridDom();
+  document.querySelectorAll("[data-action]").forEach(b => b.addEventListener("click", () => dispatchAction(b.dataset.action)));
+  document.querySelectorAll(".mode-tab").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  document.getElementById("dotpadBtn").addEventListener("click", () => { dotpadConnected ? disconnectDotPad() : connectDotPad(); });
+
+  window.addEventListener("keydown", (e) => {
+    const map = { ArrowLeft:"left", ArrowRight:"right", ArrowUp:"up", ArrowDown:"down", Enter:"confirm", " ":"repeat" };
+    if (map[e.key]) { e.preventDefault(); dispatchAction(map[e.key]); return; }
+    if (e.key === "1") setMode("moon");
+    if (e.key === "2") setMode("dipper");
+    if (e.key === "3") setMode("eclipse");
+    if (e.key.toLowerCase() === "r") dispatchAction("reset");
+  });
+
+  setMode("cosmos");
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
