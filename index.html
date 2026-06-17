@@ -558,6 +558,14 @@
     color: var(--ink);
     cursor: pointer;
   }
+  /* select가 있는 행은 라벨+셀렉트를 세로 스택으로 — 영문 긴 라벨에서 오버플로 방지 */
+  .toggle-row:has(select) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
+  .toggle-row:has(select) label { flex: none; }
+  .toggle-row:has(select) select { margin-left: 0; width: 100%; }
 
   .keyhint { font-size: 11px; color: var(--ink-faint); line-height: 1.8; padding-top: 2px; }
   .keyhint code {
