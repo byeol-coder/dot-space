@@ -9,265 +9,615 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
 <style>
   /* =========================================================================
-     DOT SPACE QUEST — 콕핏 픽셀아트 스킨
-     접근성: WCAG AAA(본문 7:1+), 본문 18px+, 강한 포커스 링, 깜빡임 없음.
-     픽셀 글꼴(Press Start 2P)은 '장식용 제목·라벨'에만 사용하고,
-     읽어야 하는 본문/안내는 Noto Sans KR로 또렷하게 표시한다(저시력 가독성).
+     DOT SPACE QUEST — 게임 플랫폼 스킨 v2
+     WCAG AAA(본문 7:1+), 44px 터치 타겟, 키보드 완전 접근, prefers-reduced-motion 안전.
+     픽셀 글꼴은 제목·라벨 장식 전용. 읽어야 할 본문은 Noto Sans KR.
      ========================================================================= */
   :root {
-    --space:    #070b1c;   /* 우주 배경 */
-    --hull:     #16223f;   /* 선체 패널 */
-    --panel:    #111a33;   /* 콘솔 패널 */
-    --panel-2:  #1a2748;   /* 패널 강조 */
-    --edge:     #3b5a86;   /* 금속 테두리 */
-    --edge-lo:  #0a1124;   /* 어두운 테두리/그림자 */
-    --screen:   #141d34;   /* 뷰스크린 바탕 */
-    --green:    #7ee787;   /* 뷰스크린 테두리(초록) */
-    --ink:      #f3f7ff;   /* 본문(대비 ~16:1) */
-    --ink-dim:  #a9b7d6;   /* 보조(대비 ~8:1) */
-    --cyan:     #7fd6ff;   /* 라벨 시안 */
-    --yellow:   #ffd35c;   /* 강조 노랑 */
-    --mint:     #8fe6b0;   /* 진행/연결 */
-    --coral:    #ff8a76;   /* 경고/태양 */
-    --on:       #ffe9a8;   /* 점 ON(따뜻한 크림) */
-    --off:      #20294a;   /* 점 OFF */
-    --focus:    #ffffff;
+    --space:     #03060f;
+    --hull:      #0b1222;
+    --panel:     #0e1628;
+    --panel-2:   #122038;
+    --panel-3:   #1c2d50;
+    --edge:      #284265;
+    --edge-lo:   #05081a;
+    --edge-hi:   #4a7ab5;
+    --screen:    #070f1c;
+    --green:     #4cf278;
+    --green-dim: #1a4a2a;
+    --ink:       #eef4ff;
+    --ink-dim:   #7e9bc4;
+    --ink-faint: #3d5475;
+    --cyan:      #5dd6ff;
+    --yellow:    #ffcf3a;
+    --mint:      #6fdea0;
+    --coral:     #ff7060;
+    --on:        #ffe87a;
+    --off:       #101830;
+    --focus:     #ffffff;
+
+    --glow-g:  0 0 10px rgba(76,242,120,.4), 0 0 28px rgba(76,242,120,.12);
+    --glow-c:  0 0 10px rgba(93,214,255,.4), 0 0 28px rgba(93,214,255,.12);
+    --glow-y:  0 0 10px rgba(255,207,58,.4),  0 0 28px rgba(255,207,58,.12);
+    --glow-on: 0 0 6px rgba(255,232,122,.75);
+    --shadow:  0 5px 0 var(--edge-lo), inset 0 0 0 1px rgba(255,255,255,.04);
   }
+
   * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   html, body {
     margin: 0;
+    min-height: 100vh;
     background:
-      radial-gradient(1100px 700px at 78% 8%, #122244 0%, transparent 55%),
-      radial-gradient(900px 600px at 12% 92%, #101a3a 0%, transparent 55%),
+      radial-gradient(ellipse 150% 55% at 80% 0%,   #0f2040 0%, transparent 60%),
+      radial-gradient(ellipse 110% 70% at  8% 100%, #0a1830 0%, transparent 60%),
       var(--space);
     color: var(--ink);
     font-family: "Noto Sans KR", system-ui, sans-serif;
-    font-size: 18px;
-    line-height: 1.6;
-    image-rendering: pixelated;
+    font-size: 17px;
+    line-height: 1.65;
   }
-  .wrap { max-width: 1240px; margin: 0 auto; padding: 22px 18px 40px; }
 
-  .pixel { font-family: "Press Start 2P", monospace; line-height: 1.5; letter-spacing: .5px; }
+  /* ---- 픽셀 타입페이스 ---- */
+  .pixel { font-family: "Press Start 2P", monospace; line-height: 1.5; letter-spacing: .4px; }
 
-  /* ---- 타이틀 ---- */
-  .title {
-    text-align: center;
-    margin: 4px 0 18px;
-  }
-  .title h1 {
-    font-family: "Press Start 2P", monospace;
-    font-size: clamp(22px, 4.4vw, 40px);
-    margin: 0;
-    color: var(--cyan);
-    text-shadow: 0 0 10px rgba(127,214,255,.35), 3px 3px 0 var(--edge-lo);
-  }
-  .title h1 .mvp { color: var(--yellow); }
-  .title .sub { margin-top: 8px; color: var(--ink-dim); font-size: 15px; }
-
-  /* 패널 공통: 픽셀풍 하드 테두리 + 오프셋 그림자 */
+  /* ---- 공통 패널 ---- */
   .panel {
     background: var(--panel);
-    border: 3px solid var(--edge);
-    box-shadow: 0 6px 0 var(--edge-lo), inset 0 0 0 2px var(--edge-lo);
-    border-radius: 6px;
-    padding: 16px;
+    border: 2px solid var(--edge);
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    padding: 14px 16px;
   }
-  .panel h2 {
+  .panel-title {
     font-family: "Press Start 2P", monospace;
-    font-size: 13px;
-    color: var(--yellow);
+    font-size: 9px;
+    color: var(--ink-faint);
+    letter-spacing: .9px;
     margin: 0 0 12px;
-    letter-spacing: .5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--edge), transparent);
   }
 
-  /* ---- 레이아웃: 좌(미션) 중(뷰스크린) 우(상태) ---- */
+  /* ===================================================================
+     최상단 헤더
+     =================================================================== */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 24px 12px;
+    border-bottom: 1px solid var(--edge);
+    background: linear-gradient(to bottom, rgba(12,20,38,.95), transparent);
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .logo h1 {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(13px, 2.2vw, 26px);
+    margin: 0;
+    color: var(--cyan);
+    text-shadow: 0 0 20px rgba(93,214,255,.5), 3px 3px 0 var(--edge-lo);
+  }
+  .logo h1 .star { color: var(--yellow); text-shadow: var(--glow-y); }
+  .logo .tagline { color: var(--ink-dim); font-size: 13px; white-space: nowrap; }
+
+  /* ---- 언어 토글 ---- */
+  .lang-toggle {
+    display: inline-flex;
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 0 var(--edge-lo);
+    flex-shrink: 0;
+  }
+  .lang-btn {
+    background: var(--panel-2);
+    color: var(--ink-dim);
+    border: none;
+    border-right: 1px solid var(--edge);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 16px;
+    min-height: 44px;
+    cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .lang-btn:last-child { border-right: none; }
+  .lang-btn:hover { color: var(--ink); background: var(--panel-3); }
+  .lang-btn[aria-pressed="true"] { background: var(--green); color: #021a08; }
+
+  /* ===================================================================
+     페이지 래퍼 & 덱 레이아웃
+     =================================================================== */
+  .wrap { max-width: 1340px; margin: 0 auto; padding: 0 16px 52px; }
+
+  /* 3열 덱 — 좌(미션) 중(뷰스크린) 우(상태) */
   .deck {
     display: grid;
-    grid-template-columns: 230px minmax(0,1fr) 250px;
-    gap: 16px;
+    grid-template-columns: 212px minmax(0, 1fr) 248px;
+    gap: 14px;
     align-items: start;
+    padding-top: 14px;
   }
-  @media (max-width: 980px) { .deck { grid-template-columns: 1fr; } }
 
-  /* ---- MISSION MODE 탭 ---- */
-  .modes { display: grid; gap: 10px; }
+  /* 태블릿: 오른쪽 패널을 중앙 아래 두 번째 행으로 */
+  @media (max-width: 1100px) {
+    .deck {
+      grid-template-columns: 196px minmax(0, 1fr);
+      grid-template-areas:
+        "nav    screen"
+        "nav    status";
+    }
+    .deck > nav     { grid-area: nav; }
+    .deck > section { grid-area: screen; }
+    .deck > aside   { grid-area: status; }
+  }
+
+  /* 모바일: 1열, 그리드를 가장 먼저 */
+  @media (max-width: 680px) {
+    .deck {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "screen"
+        "nav"
+        "status";
+    }
+    .site-header { padding: 12px 14px 10px; }
+    .logo .tagline { display: none; }
+  }
+
+  /* ===================================================================
+     MISSION NAV (좌)
+     =================================================================== */
+  .missions-panel { display: grid; gap: 7px; }
+
   .mode-tab {
-    display: flex; align-items: center; gap: 10px;
-    width: 100%; text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    text-align: left;
     background: var(--panel-2);
     color: var(--ink);
     border: 2px solid var(--edge);
-    border-radius: 6px;
-    padding: 11px 12px;
-    font-family: inherit; font-size: 17px; font-weight: 700;
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
     box-shadow: 0 3px 0 var(--edge-lo);
-    transition: border-color .12s, background .12s, transform .04s, box-shadow .04s;
+    transition: border-color .12s, background .12s;
+    position: relative;
+    overflow: hidden;
   }
   .mode-tab .ico {
-    width: 30px; height: 30px; flex: none;
-    display: grid; place-items: center;
-    border: 2px solid var(--edge); border-radius: 5px;
-    background: var(--screen); color: var(--yellow);
-    font-family: "Press Start 2P", monospace; font-size: 12px;
+    width: 30px; height: 30px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 2px solid var(--edge);
+    border-radius: 6px;
+    background: var(--screen);
+    color: var(--yellow);
+    font-family: "Press Start 2P", monospace;
+    font-size: 11px;
   }
-  .mode-tab small { display:block; font-weight:400; font-size:13px; color:var(--ink-dim); }
-  .mode-tab[aria-pressed="true"] { border-color: var(--green); background: #16234a; }
+  .mode-tab .tab-text { flex: 1; min-width: 0; }
+  .mode-tab small {
+    display: block;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mode-tab .done-badge {
+    font-size: 13px;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity .2s;
+    color: var(--mint);
+  }
+  .mode-tab[aria-pressed="true"] {
+    border-color: var(--green);
+    background: #0f1e3a;
+    box-shadow: var(--glow-g), 0 3px 0 var(--edge-lo);
+  }
   .mode-tab[aria-pressed="true"] .ico { border-color: var(--green); color: var(--mint); }
+  .mode-tab.done .done-badge { opacity: 1; }
+  .mode-tab.done { border-color: var(--green-dim); }
   .mode-tab:hover { border-color: var(--cyan); }
   .mode-tab:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge-lo); }
 
-  /* ---- 뷰스크린 ---- */
-  .screen-wrap { display: grid; gap: 12px; }
-  .screen-title {
-    text-align: center;
+  @media (max-width: 680px) {
+    .missions-panel { grid-template-columns: repeat(2, 1fr); }
+    .mode-tab small { display: none; }
+    .mode-tab .done-badge { display: none; }
+  }
+
+  /* ===================================================================
+     CENTER SCREEN (중)
+     =================================================================== */
+  .screen-wrap { display: grid; gap: 10px; }
+
+  /* HUD 바 — 모드명 + 좌표 */
+  .screen-hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 14px;
+    background: var(--panel);
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+  }
+  #learnBar {
     font-family: "Press Start 2P", monospace;
-    font-size: 13px; color: var(--green);
-    border: 2px solid var(--green); border-radius: 6px;
-    padding: 9px; background: rgba(126,231,135,.07);
+    font-size: 10px;
+    color: var(--green);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .learn-bar {
-    font-family: "Press Start 2P", monospace; font-size: 11px;
-    color: var(--cyan); text-align: center; letter-spacing: .5px;
+  #coord {
+    font-family: "Press Start 2P", monospace;
+    font-size: 9px;
+    color: var(--mint);
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  /* aria-live 안내 */
-  .guide {
+
+  /* 동반자 말풍선 */
+  .guide-bubble {
+    position: relative;
     background: var(--panel-2);
     border: 2px solid var(--edge);
-    border-left: 5px solid var(--yellow);
-    border-radius: 6px;
-    padding: 12px 14px; min-height: 58px;
-    font-size: 18px; color: var(--ink);
+    border-left: 4px solid var(--yellow);
+    border-radius: 0 8px 8px 8px;
+    padding: 10px 14px;
+    min-height: 52px;
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.65;
   }
+  .guide-bubble::before {
+    content: "★";
+    position: absolute;
+    top: -15px;
+    left: -2px;
+    font-size: 11px;
+    color: var(--yellow);
+    text-shadow: var(--glow-y);
+  }
+
+  /* 점 그리드 프레임 */
   .grid-frame {
     background: var(--screen);
-    border: 4px solid var(--green);
-    border-radius: 8px;
-    box-shadow: inset 0 0 0 2px var(--edge-lo), 0 6px 0 var(--edge-lo);
-    padding: 12px;
+    border: 3px solid var(--green);
+    border-radius: 10px;
+    box-shadow: var(--glow-g), 0 6px 0 var(--edge-lo);
+    padding: 10px;
     position: relative;
-    overflow-x: auto;
+    overflow: hidden;
   }
-  /* 정적 스캔라인(애니메이션 없음 — 광과민성 안전) */
   .grid-frame::after {
-    content: ""; position: absolute; inset: 8px; pointer-events: none;
-    background: repeating-linear-gradient(to bottom, rgba(255,255,255,.04) 0 1px, transparent 1px 4px);
-    border-radius: 6px;
+    content: "";
+    position: absolute;
+    inset: 6px;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.022) 0 1px,
+      transparent 1px 4px
+    );
+    border-radius: 7px;
   }
   #grid {
     display: grid;
     grid-template-columns: repeat(60, 1fr);
-    gap: 2px; width: 100%; min-width: 560px;
+    gap: clamp(0.5px, 0.18vw, 2px);
+    width: 100%;
     aspect-ratio: 60 / 40;
-    position: relative; z-index: 1;
+    position: relative;
+    z-index: 1;
   }
   .cell { background: var(--off); border-radius: 50%; width: 100%; aspect-ratio: 1/1; }
-  .cell.on { background: var(--on); box-shadow: 0 0 3px rgba(255,233,168,.5); }
+  .cell.on { background: var(--on); box-shadow: var(--glow-on); }
   .cell.cursor { box-shadow: 0 0 0 2px var(--cyan); border-radius: 2px; }
 
-  /* ---- 입력 패널 ---- */
-  .input-panel h2 { color: var(--yellow); }
-  .input-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  /* ---- 컨트롤 패널 ---- */
+  .controls-panel { display: grid; gap: 12px; }
+  .dpad-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+
   .dpad {
     display: grid;
-    grid-template-columns: repeat(3, 52px);
-    grid-template-rows: repeat(3, 52px);
-    gap: 7px;
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 50px);
+    gap: 6px;
+    flex-shrink: 0;
   }
   .dpad .spacer { visibility: hidden; }
+
   button.key {
-    background: var(--panel-2); color: var(--ink);
-    border: 2px solid var(--edge); border-radius: 7px;
-    font-family: inherit; font-size: 20px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 3px 0 var(--edge-lo);
-    transition: transform .04s, box-shadow .04s, border-color .12s;
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--edge-lo);
+    transition: border-color .1s, transform .04s, box-shadow .04s;
+    display: grid;
+    place-items: center;
   }
   button.key:hover { border-color: var(--cyan); }
-  button.key:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge-lo); }
-  button.key.go { border-color: var(--green); }
-  .legend { font-size: 16px; color: var(--ink-dim); line-height: 1.9; }
+  button.key:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--edge-lo); }
+  button.key.go { border-color: var(--green); color: var(--mint); }
+  button.key.go:hover { box-shadow: var(--glow-g), 0 4px 0 var(--edge-lo); }
+
+  .legend { font-size: 14px; color: var(--ink-dim); line-height: 2.1; }
   .legend b { color: var(--mint); }
   .legend .k {
-    font-family: "Press Start 2P", monospace; font-size: 11px; color: var(--ink);
-    background: var(--panel-2); border: 1px solid var(--edge); border-radius: 4px;
-    padding: 3px 6px; margin-right: 4px;
+    font-family: "Press Start 2P", monospace;
+    font-size: 10px;
+    color: var(--ink);
+    background: var(--panel-2);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-right: 4px;
   }
-  .extra-row { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
-  button.action {
-    flex: 1 1 130px; min-height: 48px;
-    background: var(--panel-2); color: var(--ink);
-    border: 2px solid var(--edge); border-radius: 7px;
-    font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
-    box-shadow: 0 3px 0 var(--edge-lo);
-  }
-  button.action:active { transform: translateY(2px); box-shadow:0 1px 0 var(--edge-lo); }
 
-  /* ---- 상태 패널 ---- */
-  .stat { display:grid; grid-template-columns: auto 1fr; gap: 9px 10px; align-items:center; margin-bottom: 4px; }
-  .stat .lbl { color: var(--cyan); font-size: 15px; font-family:"Press Start 2P",monospace; font-size:10px; letter-spacing:.5px; }
-  .stat .val { font-weight: 700; font-size: 18px; text-align: right; }
-  .stat .val.coord { color: var(--mint); }
-  .pill { display:inline-block; padding: 3px 10px; border-radius: 999px; font-size:14px; font-weight:700; border:2px solid var(--edge); }
+  .action-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button.action {
+    flex: 1 1 120px;
+    min-height: 46px;
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 3px 0 var(--edge-lo);
+    transition: border-color .1s;
+  }
+  button.action:hover { border-color: var(--cyan); }
+  button.action:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge-lo); }
+
+  /* ===================================================================
+     STATUS / HUD ASIDE (우)
+     =================================================================== */
+  .status-aside { display: grid; gap: 10px; }
+
+  /* 점수 블록 */
+  .score-block {
+    background: var(--panel-2);
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 7px 12px;
+    align-items: center;
+  }
+  .score-block .s-lbl {
+    font-family: "Press Start 2P", monospace;
+    font-size: 8px;
+    color: var(--ink-faint);
+    letter-spacing: .6px;
+    white-space: nowrap;
+  }
+  .score-block .s-val {
+    font-weight: 900;
+    font-size: 20px;
+    text-align: right;
+    line-height: 1;
+  }
+  #score { color: var(--yellow); }
+  #phase {
+    font-family: "Press Start 2P", monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    text-align: right;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  /* 진행도 블록 */
+  .progress-block {
+    background: var(--panel-2);
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .prog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 7px;
+  }
+  .prog-header .prog-label {
+    font-family: "Press Start 2P", monospace;
+    font-size: 8px;
+    color: var(--ink-faint);
+    letter-spacing: .6px;
+  }
+  #progressText { font-weight: 700; color: var(--mint); font-size: 15px; }
+  .progress-track {
+    height: 10px;
+    background: var(--off);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--edge);
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(to right, var(--mint), var(--green));
+    border-radius: 999px;
+    transition: width .3s ease;
+    box-shadow: 0 0 6px rgba(111,222,160,.4);
+  }
+
+  /* DotPad 블록 */
+  .dotpad-block {
+    background: var(--panel-2);
+    border: 2px solid var(--edge);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .dotpad-status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .dotpad-status-row .lbl {
+    font-family: "Press Start 2P", monospace;
+    font-size: 8px;
+    color: var(--ink-faint);
+    letter-spacing: .6px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 2px solid var(--edge);
+  }
   .pill.off { color: var(--ink-dim); }
-  .pill.on { color:#04210f; background: var(--mint); border-color: var(--mint); }
-  .progress-track { grid-column: 1/-1; height: 12px; background: var(--off); border-radius: 999px; overflow:hidden; border:1px solid var(--edge); }
-  .progress-fill { height:100%; width:0%; background: var(--mint); transition: width .25s ease; }
+  .pill.on  { color: #021a08; background: var(--mint); border-color: var(--mint); box-shadow: var(--glow-g); }
+  .pill.on::before { content: "●"; font-size: 7px; }
 
   #dotpadBtn {
-    width:100%; min-height:50px; margin-top:14px;
-    background: var(--panel-2); color: var(--ink);
-    border:2px solid var(--green); border-radius:7px;
-    font-family: inherit; font-size:18px; font-weight:700; cursor:pointer;
+    width: 100%;
+    min-height: 48px;
+    background: var(--panel);
+    color: var(--ink);
+    border: 2px solid var(--green);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
     box-shadow: 0 3px 0 var(--edge-lo);
+    transition: box-shadow .14s;
   }
-  #dotpadBtn:active { transform: translateY(2px); box-shadow:0 1px 0 var(--edge-lo); }
-  .toggle-row { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:16px; color:var(--ink-dim); }
-  .toggle-row input { width:22px; height:22px; accent-color: var(--green); }
-  .toggle-row select { margin-left:auto; font-family:inherit; font-size:15px; padding:5px 8px; border-radius:8px;
-    border:1px solid var(--edge); background:var(--off); color:var(--ink); }
-  .keyhint { margin-top:14px; font-size:13px; color:var(--ink-dim); line-height:1.6; }
-  .keyhint code { background:var(--panel-2); border:1px solid var(--edge); border-radius:4px; padding:1px 5px; color:var(--ink); font-size:12px; }
-  .badge {
-    margin-top:14px; text-align:center; font-family:"Press Start 2P",monospace; font-size:10px;
-    color: var(--coral); border:2px dashed var(--edge); border-radius:6px; padding:10px 8px; line-height:1.7;
+  #dotpadBtn:hover { box-shadow: var(--glow-g), 0 3px 0 var(--edge-lo); }
+  #dotpadBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--edge-lo); }
+
+  /* 설정 블록 */
+  .settings-block { display: grid; gap: 9px; }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  .toggle-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--green); flex-shrink: 0; }
+  .toggle-row label { flex: 1; cursor: pointer; line-height: 1.4; }
+  .toggle-row select {
+    margin-left: auto;
+    flex-shrink: 0;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 4px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--edge);
+    background: var(--off);
+    color: var(--ink);
+    cursor: pointer;
   }
 
-  /* ---- 하단 배너 ---- */
-  .footer-banner {
-    margin-top: 18px; text-align:center;
-    border: 3px solid var(--edge); border-radius:6px;
-    background: var(--panel); box-shadow: 0 6px 0 var(--edge-lo);
-    padding: 12px;
+  .keyhint { font-size: 11px; color: var(--ink-faint); line-height: 1.8; padding-top: 2px; }
+  .keyhint code {
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-radius: 4px;
+    padding: 1px 5px;
+    color: var(--ink-dim);
+    font-size: 10px;
   }
-  .footer-banner .pixel { font-size: 13px; color: var(--yellow); }
-  .footer-banner .sub { color: var(--ink-dim); font-size:14px; margin-top:6px; }
 
-  button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
-  .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-
-  /* ---- 언어 토글 / Language toggle ---- */
-  .lang-toggle {
-    display: inline-flex; gap: 0; margin-top: 12px;
-    border: 2px solid var(--edge); border-radius: 8px; overflow: hidden;
-    box-shadow: 0 3px 0 var(--edge-lo);
+  .rank-badge {
+    text-align: center;
+    font-family: "Press Start 2P", monospace;
+    font-size: 9px;
+    color: var(--coral);
+    border: 2px dashed var(--edge);
+    border-radius: 8px;
+    padding: 10px 8px;
+    line-height: 1.9;
+    letter-spacing: .6px;
   }
-  .lang-btn {
-    background: var(--panel-2); color: var(--ink);
-    border: none; border-right: 2px solid var(--edge);
-    font-family: inherit; font-size: 16px; font-weight: 700;
-    padding: 10px 18px; min-height: 44px; cursor: pointer;
-    transition: background .12s, color .12s;
-  }
-  .lang-btn:last-child { border-right: none; }
-  .lang-btn:hover { color: var(--ink); background: #16234a; }
-  .lang-btn[aria-pressed="true"] { background: var(--green); color: #04210f; }
 
-  /* ---- 동작 최소화 선호 시 모든 전환·애니메이션 제거 (전정기관 안전) ---- */
+  /* ===================================================================
+     푸터
+     =================================================================== */
+  .site-footer {
+    text-align: center;
+    padding: 14px 24px;
+    margin-top: 18px;
+    border-top: 1px solid var(--edge);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .site-footer .pixel { font-size: 9px; color: var(--ink-faint); }
+  .site-footer .sub { color: var(--ink-dim); font-size: 13px; }
+
+  /* ===================================================================
+     접근성 & 포커스
+     =================================================================== */
+  button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0;
+    margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+    white-space: nowrap; border: 0;
+  }
+
+  /* ===================================================================
+     prefers-reduced-motion — 전정기관 안전
+     =================================================================== */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
-      transition-duration: 0.01ms !important;
-      animation-duration: 0.01ms !important;
+      transition-duration: .01ms !important;
+      animation-duration: .01ms !important;
       animation-iteration-count: 1 !important;
       scroll-behavior: auto !important;
     }
@@ -275,65 +625,80 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <div class="title">
-    <h1 class="pixel">DOT SPACE QUEST <span class="mvp">MVP</span></h1>
-    <div class="sub" data-i18n="subtitle">촉각 우주 학습 게임 · 60×40 점으로 만지는 우주 탐험</div>
-    <div class="lang-toggle" role="group" aria-label="언어 선택 / Language">
-      <button class="lang-btn" data-lang="ko" aria-pressed="true" lang="ko">한국어</button>
-      <button class="lang-btn" data-lang="en" aria-pressed="false" lang="en">English</button>
-    </div>
+<!-- ===== 사이트 헤더 ===== -->
+<header class="site-header">
+  <div class="logo">
+    <h1 class="pixel">DOT SPACE <span class="star">★</span> QUEST</h1>
+    <span class="tagline" data-i18n="subtitle">촉각 우주 학습 게임 · 60×40 점으로 만지는 우주 탐험</span>
   </div>
+  <div class="lang-toggle" role="group" aria-label="언어 선택 / Language">
+    <button class="lang-btn" data-lang="ko" aria-pressed="true" lang="ko">한국어</button>
+    <button class="lang-btn" data-lang="en" aria-pressed="false" lang="en">English</button>
+  </div>
+</header>
 
+<div class="wrap">
   <div class="deck" role="main" data-i18n-aria="aria_main" aria-label="우주 탐험 게임">
-    <!-- 좌: MISSION MODE -->
+
+    <!-- ===== 좌: MISSION NAV ===== -->
     <nav class="panel" data-i18n-aria="aria_nav_mission" aria-label="미션 선택">
-      <h2 class="pixel">MISSION MODE</h2>
-      <div class="modes">
+      <div class="panel-title">MISSIONS</div>
+      <div class="missions-panel">
         <button class="mode-tab" data-mode="map" aria-pressed="true" aria-keyshortcuts="M">
           <span class="ico">🗺</span>
-          <span><span data-i18n="tab_map">우주 지도</span><small data-i18n="tab_map_sub">날아가서 별빛 되찾기</small></span>
+          <span class="tab-text"><span data-i18n="tab_map">우주 지도</span><small data-i18n="tab_map_sub">날아가서 별빛 되찾기</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
         <button class="mode-tab" data-mode="cosmos" aria-pressed="false">
           <span class="ico">★</span>
-          <span><span data-i18n="tab_cosmos">나의 우주</span><small data-i18n="tab_cosmos_sub">모은 것 만져보기(일지)</small></span>
+          <span class="tab-text"><span data-i18n="tab_cosmos">나의 우주</span><small data-i18n="tab_cosmos_sub">모은 것 만져보기</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
         <button class="mode-tab" data-mode="texture" aria-pressed="false">
           <span class="ico">◐</span>
-          <span><span data-i18n="tab_texture">행성 질감</span><small data-i18n="tab_texture_sub">표면을 만져서 배우기</small></span>
+          <span class="tab-text"><span data-i18n="tab_texture">행성 질감</span><small data-i18n="tab_texture_sub">표면을 만져서 배우기</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
         <button class="mode-tab" data-mode="moon" aria-pressed="false" aria-keyshortcuts="1">
           <span class="ico">1</span>
-          <span><span data-i18n="tab_moon">달까지 가기</span><small data-i18n="tab_moon_sub">우주선으로 달 도착</small></span>
+          <span class="tab-text"><span data-i18n="tab_moon">달까지 가기</span><small data-i18n="tab_moon_sub">우주선으로 달 도착</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
         <button class="mode-tab" data-mode="dipper" aria-pressed="false" aria-keyshortcuts="2">
           <span class="ico">2</span>
-          <span><span data-i18n="tab_dipper">별자리 잇기</span><small data-i18n="tab_dipper_sub">북두칠성·카시오페이아</small></span>
+          <span class="tab-text"><span data-i18n="tab_dipper">별자리 잇기</span><small data-i18n="tab_dipper_sub">북두칠성·카시오페이아</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
         <button class="mode-tab" data-mode="eclipse" aria-pressed="false" aria-keyshortcuts="3">
           <span class="ico">3</span>
-          <span><span data-i18n="tab_eclipse">일식 체험</span><small data-i18n="tab_eclipse_sub">달이 해를 가리기</small></span>
+          <span class="tab-text"><span data-i18n="tab_eclipse">일식 체험</span><small data-i18n="tab_eclipse_sub">달이 해를 가리기</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
         <button class="mode-tab" data-mode="quiz" aria-pressed="false" aria-keyshortcuts="4">
           <span class="ico">4</span>
-          <span><span data-i18n="tab_quiz">별 퀴즈</span><small data-i18n="tab_quiz_sub">모양 만지고 맞히기</small></span>
+          <span class="tab-text"><span data-i18n="tab_quiz">별 퀴즈</span><small data-i18n="tab_quiz_sub">모양 만지고 맞히기</small></span>
+          <span class="done-badge" aria-hidden="true">✓</span>
         </button>
       </div>
     </nav>
 
-    <!-- 중: 뷰스크린 -->
+    <!-- ===== 중: VIEWSCREEN + CONTROLS ===== -->
     <section class="screen-wrap" data-i18n-aria="aria_screen" aria-label="촉각 그래픽 미리보기">
-      <div class="screen-title pixel">60×40 TACTILE GRAPHICS AREA</div>
-      <div class="learn-bar" id="learnBar">LEARN MODE</div>
-      <div class="guide" id="guide" aria-hidden="true"></div>
+      <!-- HUD 바 -->
+      <div class="screen-hud">
+        <span id="learnBar">LEARN MODE</span>
+        <span id="coord">—</span>
+      </div>
+      <!-- 동반자 말풍선 -->
+      <div class="guide-bubble" id="guide" aria-hidden="true"></div>
+      <!-- 촉각 그리드 -->
       <div class="grid-frame">
         <div id="grid" role="img" aria-label="60 곱하기 40 촉각 점 그래픽"></div>
       </div>
-
-      <div class="panel input-panel" data-i18n-aria="aria_input" aria-label="조작">
-        <h2 class="pixel">INPUT &amp; REAL-TIME UPDATE</h2>
-        <div class="input-row">
+      <!-- 컨트롤 패널 -->
+      <div class="panel controls-panel" data-i18n-aria="aria_input" aria-label="조작">
+        <div class="panel-title">CONTROLS</div>
+        <div class="dpad-row">
           <div class="dpad" role="group" data-i18n-aria="aria_dpad" aria-label="이동 방향">
             <span class="spacer"></span>
             <button class="key" data-action="up" data-i18n-aria="aria_up" aria-label="위로 이동" aria-keyshortcuts="ArrowUp">↑</button>
@@ -351,78 +716,86 @@
             <div><span class="k" data-i18n="legend_repeat_k">다시</span> <b data-i18n="legend_repeat">현재 장면 다시 출력</b></div>
           </div>
         </div>
-        <div class="extra-row">
+        <div class="action-row">
           <button class="action" data-action="repeat" data-i18n="btn_repeat" data-i18n-aria="btn_repeat" aria-label="현재 장면 다시 출력" aria-keyshortcuts="Space">다시 출력</button>
           <button class="action" data-action="reset" data-i18n="btn_reset" data-i18n-aria="btn_reset" aria-label="현재 미션 초기화" aria-keyshortcuts="R">미션 초기화</button>
         </div>
       </div>
     </section>
 
-    <!-- 우: 상태 -->
-    <aside class="panel" data-i18n-aria="aria_status" aria-label="진행 상태">
-      <h2 class="pixel">STATUS</h2>
-      <div class="stat">
-        <span class="lbl">COORDS</span><span class="val coord" id="coord">12, 28</span>
-        <span class="lbl">SCORE</span><span class="val" id="score" style="color:var(--yellow)">0</span>
-        <span class="lbl">MISSION</span><span class="val" id="phase" style="font-size:16px">MY COSMOS</span>
-        <span class="lbl">PROGRESS</span><span class="val" id="progressText">0%</span>
-        <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
-        <span class="lbl">DOT PAD</span><span class="val"><span class="pill off" id="dotpadPill">미연결</span></span>
+    <!-- ===== 우: STATUS HUD ===== -->
+    <aside class="status-aside" data-i18n-aria="aria_status" aria-label="진행 상태">
+      <!-- 점수 -->
+      <div class="score-block">
+        <span class="s-lbl">SCORE</span>
+        <span class="s-val" id="score">0</span>
+        <span class="s-lbl">MISSION</span>
+        <span id="phase">—</span>
       </div>
-
-      <button id="dotpadBtn" data-i18n-aria="dotpad_btn_aria" aria-label="닷패드 블루투스 연결">닷패드 연결</button>
-
-      <div class="toggle-row">
-        <input type="checkbox" id="ttsToggle" checked />
-        <label for="ttsToggle" data-i18n="opt_tts">음성 안내(TTS) 사용</label>
+      <!-- 진행도 -->
+      <div class="progress-block">
+        <div class="prog-header">
+          <span class="prog-label">PROGRESS</span>
+          <span id="progressText">0%</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
       </div>
-
-      <div class="toggle-row">
-        <input type="checkbox" id="audioToggle" checked />
-        <label for="audioToggle" data-i18n="opt_audio">공간 음향(소리로 찾기) 사용</label>
+      <!-- DotPad 연결 -->
+      <div class="dotpad-block">
+        <div class="dotpad-status-row">
+          <span class="lbl">DOT PAD</span>
+          <span class="pill off" id="dotpadPill">미연결</span>
+        </div>
+        <button id="dotpadBtn" data-i18n-aria="dotpad_btn_aria" aria-label="닷패드 블루투스 연결">닷패드 연결</button>
       </div>
-
-      <div class="toggle-row">
-        <label for="verbosity" data-i18n="opt_verbosity">안내 상세도</label>
-        <select id="verbosity" data-i18n-aria="opt_verbosity_aria" aria-label="음성 안내 상세도">
-          <option value="brief" data-i18n="verbosity_brief">간략 (소리 위주)</option>
-          <option value="standard" selected data-i18n="verbosity_standard">표준</option>
-          <option value="detailed" data-i18n="verbosity_detailed">상세 (좌표까지)</option>
+      <!-- 설정 -->
+      <div class="panel settings-block">
+        <div class="panel-title">SETTINGS</div>
+        <div class="toggle-row">
+          <input type="checkbox" id="ttsToggle" checked />
+          <label for="ttsToggle" data-i18n="opt_tts">음성 안내(TTS) 사용</label>
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="audioToggle" checked />
+          <label for="audioToggle" data-i18n="opt_audio">공간 음향(소리로 찾기) 사용</label>
+        </div>
+        <div class="toggle-row">
+          <label for="verbosity" data-i18n="opt_verbosity">안내 상세도</label>
+          <select id="verbosity" data-i18n-aria="opt_verbosity_aria" aria-label="음성 안내 상세도">
+            <option value="brief" data-i18n="verbosity_brief">간략 (소리 위주)</option>
+            <option value="standard" selected data-i18n="verbosity_standard">표준</option>
+            <option value="detailed" data-i18n="verbosity_detailed">상세 (좌표까지)</option>
+          </select>
+        </div>
+        <div class="toggle-row">
+          <label for="difficulty" data-i18n="opt_difficulty">난이도</label>
+          <select id="difficulty" data-i18n-aria="opt_difficulty_aria" aria-label="미션 난이도">
+            <option value="easy" data-i18n="difficulty_easy">쉬움</option>
+            <option value="normal" selected data-i18n="difficulty_normal">보통</option>
+            <option value="hard" data-i18n="difficulty_hard">어려움</option>
         </select>
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="hiResToggle" />
+          <label for="hiResToggle" data-i18n="opt_hires">고해상도 디테일 (별자리·퀴즈, 96×64)</label>
+        </div>
+        <p class="keyhint" data-i18n-html="keyhint">
+          <b style="color:var(--ink)">실기기(닷패드):</b> 패닝키 <code>P1/P2</code>=좌/우, 기능키 <code>F1·F2</code>=위/아래, <code>F3</code>=확인, <code>F4</code>=다시. BLE로 입력을 받아 스크린리더 가로채기를 우회합니다. (지도 복귀는 메뉴 버튼/<code>M</code>)<br><b style="color:var(--ink)">키보드(개발용):</b> <code>방향키</code>·<code>Enter</code>·<code>Space</code>·<code>M</code>(지도)·<code>1~4</code>·<code>R</code>.
+        </p>
       </div>
-
-      <div class="toggle-row">
-        <label for="difficulty" data-i18n="opt_difficulty">난이도</label>
-        <select id="difficulty" data-i18n-aria="opt_difficulty_aria" aria-label="미션 난이도">
-          <option value="easy" data-i18n="difficulty_easy">쉬움</option>
-          <option value="normal" selected data-i18n="difficulty_normal">보통</option>
-          <option value="hard" data-i18n="difficulty_hard">어려움</option>
-        </select>
-      </div>
-
-      <div class="toggle-row">
-        <input type="checkbox" id="hiResToggle" />
-        <label for="hiResToggle" data-i18n="opt_hires">고해상도 디테일 (별자리·퀴즈, 96×64)</label>
-      </div>
-
-      <div class="badge pixel">COSMIC<br />TACTILE<br />EXPLORER</div>
-
-      <p class="keyhint" data-i18n-html="keyhint">
-        <b style="color:var(--ink)">실기기(닷패드):</b> 패닝키 <code>P1/P2</code>=좌/우,
-        기능키 <code>F1·F2</code>=위/아래, <code>F3</code>=확인, <code>F4</code>=다시.
-        BLE로 입력을 받아 스크린리더 가로채기를 우회합니다. (지도 복귀는 메뉴 버튼/<code>M</code>)<br />
-        <b style="color:var(--ink)">키보드(개발용):</b> <code>방향키</code>·<code>Enter</code>·<code>Space</code>·<code>M</code>(지도)·<code>1~4</code>·<code>R</code>.
-      </p>
+      <div class="rank-badge pixel">COSMIC<br>TACTILE<br>EXPLORER</div>
     </aside>
   </div>
 
-  <div class="footer-banner">
-    <div class="pixel">REAL-TIME TACTILE OUTPUT &amp; LEARNING</div>
-    <div class="sub" data-i18n="footer_sub">화면 미리보기와 닷패드는 동일한 60×40 매트릭스로 동기화됩니다.</div>
-  </div>
-
-  <div class="sr-only" id="srLive" aria-live="assertive"></div>
+  <footer class="site-footer">
+    <span class="pixel">REAL-TIME TACTILE OUTPUT &amp; LEARNING</span>
+    <span class="sub" data-i18n="footer_sub">화면 미리보기와 닷패드는 동일한 60×40 매트릭스로 동기화됩니다.</span>
+  </footer>
 </div>
+
+<div class="sr-only" id="srLive" aria-live="assertive"></div>
 
 <!-- DotPad Web SDK 1.0.0 (dotincorp/dotpad-sdk-guide), export 제거 후 인라인 -->
 <script>
@@ -1395,6 +1768,13 @@ function updateStatus() {
   pill.className = "pill " + (dotpadConnected ? "on" : "off");
   const btn = document.getElementById("dotpadBtn");
   if (btn) btn.textContent = dotpadConnected ? t("dotpad_disconnect") : t("dotpad_connect");
+  // 미션 완료 배지 (done 클래스) 업데이트
+  const doneMap = { moon: cosmos.moon, dipper: cosmos.dipper, eclipse: cosmos.eclipse,
+    quiz: cosmos.quiz, texture: cosmos.planets >= PLANETS.length,
+    map: litRegions().length >= REGIONS.length };
+  document.querySelectorAll(".mode-tab[data-mode]").forEach(b => {
+    if (b.dataset.mode in doneMap) b.classList.toggle("done", !!doneMap[b.dataset.mode]);
+  });
 }
 
 /* =========================================================================
