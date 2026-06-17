@@ -253,15 +253,25 @@
     box-shadow: 0 3px 0 var(--edge-lo);
   }
   .lang-btn {
-    background: var(--panel-2); color: var(--ink-dim);
+    background: var(--panel-2); color: var(--ink);
     border: none; border-right: 2px solid var(--edge);
-    font-family: inherit; font-size: 15px; font-weight: 700;
-    padding: 8px 16px; min-height: 40px; cursor: pointer;
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    padding: 10px 18px; min-height: 44px; cursor: pointer;
     transition: background .12s, color .12s;
   }
   .lang-btn:last-child { border-right: none; }
   .lang-btn:hover { color: var(--ink); background: #16234a; }
   .lang-btn[aria-pressed="true"] { background: var(--green); color: #04210f; }
+
+  /* ---- 동작 최소화 선호 시 모든 전환·애니메이션 제거 (전정기관 안전) ---- */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -276,12 +286,12 @@
     </div>
   </div>
 
-  <div class="deck">
+  <div class="deck" role="main" data-i18n-aria="aria_main" aria-label="우주 탐험 게임">
     <!-- 좌: MISSION MODE -->
     <nav class="panel" data-i18n-aria="aria_nav_mission" aria-label="미션 선택">
       <h2 class="pixel">MISSION MODE</h2>
       <div class="modes">
-        <button class="mode-tab" data-mode="map" aria-pressed="true">
+        <button class="mode-tab" data-mode="map" aria-pressed="true" aria-keyshortcuts="M">
           <span class="ico">🗺</span>
           <span><span data-i18n="tab_map">우주 지도</span><small data-i18n="tab_map_sub">날아가서 별빛 되찾기</small></span>
         </button>
@@ -293,19 +303,19 @@
           <span class="ico">◐</span>
           <span><span data-i18n="tab_texture">행성 질감</span><small data-i18n="tab_texture_sub">표면을 만져서 배우기</small></span>
         </button>
-        <button class="mode-tab" data-mode="moon" aria-pressed="false">
+        <button class="mode-tab" data-mode="moon" aria-pressed="false" aria-keyshortcuts="1">
           <span class="ico">1</span>
           <span><span data-i18n="tab_moon">달까지 가기</span><small data-i18n="tab_moon_sub">우주선으로 달 도착</small></span>
         </button>
-        <button class="mode-tab" data-mode="dipper" aria-pressed="false">
+        <button class="mode-tab" data-mode="dipper" aria-pressed="false" aria-keyshortcuts="2">
           <span class="ico">2</span>
           <span><span data-i18n="tab_dipper">별자리 잇기</span><small data-i18n="tab_dipper_sub">북두칠성·카시오페이아</small></span>
         </button>
-        <button class="mode-tab" data-mode="eclipse" aria-pressed="false">
+        <button class="mode-tab" data-mode="eclipse" aria-pressed="false" aria-keyshortcuts="3">
           <span class="ico">3</span>
           <span><span data-i18n="tab_eclipse">일식 체험</span><small data-i18n="tab_eclipse_sub">달이 해를 가리기</small></span>
         </button>
-        <button class="mode-tab" data-mode="quiz" aria-pressed="false">
+        <button class="mode-tab" data-mode="quiz" aria-pressed="false" aria-keyshortcuts="4">
           <span class="ico">4</span>
           <span><span data-i18n="tab_quiz">별 퀴즈</span><small data-i18n="tab_quiz_sub">모양 만지고 맞히기</small></span>
         </button>
@@ -316,7 +326,7 @@
     <section class="screen-wrap" data-i18n-aria="aria_screen" aria-label="촉각 그래픽 미리보기">
       <div class="screen-title pixel">60×40 TACTILE GRAPHICS AREA</div>
       <div class="learn-bar" id="learnBar">LEARN MODE</div>
-      <div class="guide" id="guide" role="status" aria-live="polite"></div>
+      <div class="guide" id="guide" aria-hidden="true"></div>
       <div class="grid-frame">
         <div id="grid" role="img" aria-label="60 곱하기 40 촉각 점 그래픽"></div>
       </div>
@@ -326,13 +336,13 @@
         <div class="input-row">
           <div class="dpad" role="group" data-i18n-aria="aria_dpad" aria-label="이동 방향">
             <span class="spacer"></span>
-            <button class="key" data-action="up" data-i18n-aria="aria_up" aria-label="위로 이동">↑</button>
+            <button class="key" data-action="up" data-i18n-aria="aria_up" aria-label="위로 이동" aria-keyshortcuts="ArrowUp">↑</button>
             <span class="spacer"></span>
-            <button class="key" data-action="left" data-i18n-aria="aria_left" aria-label="왼쪽으로 이동 (패닝키 P1)">←</button>
-            <button class="key go" data-action="confirm" data-i18n-aria="aria_confirm" aria-label="확인 / 선택">●</button>
-            <button class="key" data-action="right" data-i18n-aria="aria_right" aria-label="오른쪽으로 이동 (패닝키 P2)">→</button>
+            <button class="key" data-action="left" data-i18n-aria="aria_left" aria-label="왼쪽으로 이동 (패닝키 P1)" aria-keyshortcuts="ArrowLeft">←</button>
+            <button class="key go" data-action="confirm" data-i18n-aria="aria_confirm" aria-label="확인 / 선택" aria-keyshortcuts="Enter">●</button>
+            <button class="key" data-action="right" data-i18n-aria="aria_right" aria-label="오른쪽으로 이동 (패닝키 P2)" aria-keyshortcuts="ArrowRight">→</button>
             <span class="spacer"></span>
-            <button class="key" data-action="down" data-i18n-aria="aria_down" aria-label="아래로 이동">↓</button>
+            <button class="key" data-action="down" data-i18n-aria="aria_down" aria-label="아래로 이동" aria-keyshortcuts="ArrowDown">↓</button>
             <span class="spacer"></span>
           </div>
           <div class="legend">
@@ -342,8 +352,8 @@
           </div>
         </div>
         <div class="extra-row">
-          <button class="action" data-action="repeat" data-i18n="btn_repeat" data-i18n-aria="btn_repeat" aria-label="현재 장면 다시 출력">다시 출력</button>
-          <button class="action" data-action="reset" data-i18n="btn_reset" data-i18n-aria="btn_reset" aria-label="현재 미션 초기화">미션 초기화</button>
+          <button class="action" data-action="repeat" data-i18n="btn_repeat" data-i18n-aria="btn_repeat" aria-label="현재 장면 다시 출력" aria-keyshortcuts="Space">다시 출력</button>
+          <button class="action" data-action="reset" data-i18n="btn_reset" data-i18n-aria="btn_reset" aria-label="현재 미션 초기화" aria-keyshortcuts="R">미션 초기화</button>
         </div>
       </div>
     </section>
@@ -439,7 +449,7 @@ const I18N = {
     doc_title: "DOT SPACE QUEST — 촉각 우주 학습 게임",
     subtitle: "촉각 우주 학습 게임 · 60×40 점으로 만지는 우주 탐험",
     aria_nav_mission: "미션 선택", aria_screen: "촉각 그래픽 미리보기", aria_input: "조작",
-    aria_dpad: "이동 방향", aria_status: "진행 상태",
+    aria_dpad: "이동 방향", aria_status: "진행 상태", aria_main: "우주 탐험 게임",
     aria_up: "위로 이동", aria_down: "아래로 이동",
     aria_left: "왼쪽으로 이동 (패닝키 P1)", aria_right: "오른쪽으로 이동 (패닝키 P2)",
     aria_confirm: "확인 / 선택",
@@ -539,7 +549,7 @@ const I18N = {
     doc_title: "DOT SPACE QUEST — Tactile Space Learning Game",
     subtitle: "Tactile space learning game · Explore the universe with 60×40 dots",
     aria_nav_mission: "Mission select", aria_screen: "Tactile graphic preview", aria_input: "Controls",
-    aria_dpad: "Movement direction", aria_status: "Progress status",
+    aria_dpad: "Movement direction", aria_status: "Progress status", aria_main: "Space exploration game",
     aria_up: "Move up", aria_down: "Move down",
     aria_left: "Move left (panning key P1)", aria_right: "Move right (panning key P2)",
     aria_confirm: "Confirm / select",
@@ -1450,6 +1460,12 @@ function init() {
   });
 
   window.addEventListener("keydown", (e) => {
+    // 폼 컨트롤(드롭다운 등)에 포커스가 있으면 기본 동작을 보존한다 — 키보드 사용자가 설정을 바꿀 수 있게.
+    const tag = (e.target && e.target.tagName) || "";
+    if (tag === "SELECT" || tag === "INPUT" || tag === "TEXTAREA") return;
+    // 버튼에 포커스가 있을 때 Enter/Space는 네이티브 클릭에 맡겨 중복 실행을 막는다.
+    if (tag === "BUTTON" && (e.key === "Enter" || e.key === " ")) return;
+    if (e.altKey || e.ctrlKey || e.metaKey) return;   // 단축키와 충돌 방지
     const map = { ArrowLeft:"left", ArrowRight:"right", ArrowUp:"up", ArrowDown:"down", Enter:"confirm", " ":"repeat" };
     if (map[e.key]) { e.preventDefault(); dispatchAction(map[e.key]); return; }
     if (e.key === "1") setMode("moon");
