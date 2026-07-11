@@ -1,0 +1,23 @@
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.local
+*.secret
+*.secrets
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+credentials*.json
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.DS_Store
+.vscode/
+.idea/
